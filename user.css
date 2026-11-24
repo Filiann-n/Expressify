@@ -3568,3 +3568,90 @@ html body .e6ssqE0uX8qNAFRRz8rV :is([data-testid="play-button"], .main-playButto
     transform: translateX(1px) !important;
 }
 /* M3E_WHATSNEW_PLAY_FIX_END */
+
+/* M3E_PLAYER_BUTTONS_V2_START */
+/* 1. Единая геометрия (34x34, 12px) и нормальный контраст неактивных кнопок центра и правой части */
+html body .main-nowPlayingBar-center button:not([data-testid="control-button-playpause"]),
+html body .main-nowPlayingBar-right button {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    inline-size: 34px !important;
+    block-size: 34px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition:
+        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background-color 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease !important;
+}
+
+/* Чёткая иерархия яркости: Prev / Next 100%, остальные неактивные ~80% */
+html body .main-nowPlayingBar-center button:is([data-testid="control-button-skip-back"], [data-testid="control-button-skip-forward"]):not([disabled]) {
+    color: var(--spice-m3-on-surface, #e3e2e1) !important;
+}
+
+html body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"]):not([aria-checked="true"]):not([aria-checked="mixed"]):not([disabled]),
+html body .main-nowPlayingBar-right button:not([aria-pressed="true"]):not([aria-checked="true"]):not(.main-genericButton-buttonActive):not([disabled]) {
+    color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.78) !important;
+}
+
+html body :is(.main-nowPlayingBar-center, .main-nowPlayingBar-right) button:is([disabled], [aria-disabled="true"]) {
+    opacity: 0.34 !important;
+}
+
+/* 2. Активные переключатели -> выраженная M3E тональная капсула (50% круг) */
+html body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"]):is([aria-checked="true"], [aria-checked="mixed"]),
+html body .main-nowPlayingBar-right button:is([aria-pressed="true"], [aria-checked="true"], .main-genericButton-buttonActive) {
+    border-radius: 50% !important;
+    background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.22) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.36) !important;
+    color: var(--spice-m3-primary, #b8cac5) !important;
+}
+
+/* Убираем дублирующие точки снизу под капсулами (оставляя иконки с масками слева нетронутыми) */
+html body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"])::after,
+html body .main-nowPlayingBar-right button.main-genericButton-buttonActiveDot::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* 3. Пружинистые ховеры и нажатия */
+html body .main-nowPlayingBar-center button:not([data-testid="control-button-playpause"]):not([aria-checked="true"]):not([aria-checked="mixed"]):not([disabled]):hover,
+html body .main-nowPlayingBar-right button:not([aria-pressed="true"]):not([aria-checked="true"]):not(.main-genericButton-buttonActive):not([disabled]):hover {
+    background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.11) !important;
+    color: var(--spice-m3-on-surface, #e3e2e1) !important;
+    transform: scale(1.07) !important;
+}
+
+html body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"]):is([aria-checked="true"], [aria-checked="mixed"]):hover,
+html body .main-nowPlayingBar-right button:is([aria-pressed="true"], [aria-checked="true"], .main-genericButton-buttonActive):hover {
+    background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.32) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.50) !important;
+    transform: scale(1.07) !important;
+}
+
+html body .main-nowPlayingBar-center button:not([data-testid="control-button-playpause"]):not([disabled]):active,
+html body .main-nowPlayingBar-right button:not([disabled]):active {
+    border-radius: 10px !important;
+    transform: scale(0.92) !important;
+}
+
+/* Центровка иконок без внутренних сдвигов */
+html body .main-nowPlayingBar-center button:not([data-testid="control-button-playpause"]) > span,
+html body .main-nowPlayingBar-right button > span {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+/* M3E_PLAYER_BUTTONS_V2_END */
