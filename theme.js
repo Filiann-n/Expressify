@@ -1,6 +1,64 @@
 (async function M3ExpressiveTheme() {
+    const DISABLED_KEY = "m3e_theme_disabled";
+    const getThemeDisabled = () => {
+        try { return localStorage.getItem(DISABLED_KEY) === "1"; } catch { return false; }
+    };
+    const isThemeDisabled = getThemeDisabled();
+
+    function applyVanillaSpiceColors() {
+        const vanilla = {
+            "text": ["ffffff", "255, 255, 255"],
+            "subtext": ["b3b3b3", "179, 179, 179"],
+            "main": ["121212", "18, 18, 18"],
+            "main-elevated": ["282828", "40, 40, 40"],
+            "highlight": ["2a2a2a", "42, 42, 42"],
+            "highlight-elevated": ["3e3e3e", "62, 62, 62"],
+            "sidebar": ["000000", "0, 0, 0"],
+            "player": ["181818", "24, 24, 24"],
+            "card": ["282828", "40, 40, 40"],
+            "shadow": ["000000", "0, 0, 0"],
+            "selected-row": ["ffffff", "255, 255, 255"],
+            "button": ["1ed760", "30, 215, 96"],
+            "button-active": ["1fdf64", "31, 223, 100"],
+            "button-disabled": ["535353", "83, 83, 83"],
+            "tab-active": ["333333", "51, 51, 51"],
+            "notification": ["2e77d0", "46, 119, 208"],
+            "notification-error": ["e22134", "226, 33, 52"],
+            "misc": ["7f7f7f", "127, 127, 127"]
+        };
+        const root = document.documentElement.style;
+        for (const [k, [hex, rgb]] of Object.entries(vanilla)) {
+            root.setProperty(`--spice-${k}`, `#${hex}`, "important");
+            root.setProperty(`--spice-rgb-${k}`, rgb, "important");
+        }
+        root.setProperty("--spice-m3-primary", "#1ed760", "important");
+        root.setProperty("--spice-m3-on-primary", "#000000", "important");
+        root.setProperty("--spice-m3-surface-high", "#282828", "important");
+        root.setProperty("--spice-m3-surface-highest", "#3e3e3e", "important");
+        root.setProperty("--spice-m3-on-surface", "#ffffff", "important");
+        root.setProperty("--spice-m3-on-surface-var", "#b3b3b3", "important");
+        root.setProperty("--spice-rgb-m3-primary", "30, 215, 96", "important");
+        root.setProperty("--spice-rgb-m3-outline-variant", "83, 83, 83", "important");
+    }
+
+    function setThemeStylesDisabled(disabled) {
+        document.querySelectorAll('link[href*="user.css"]').forEach((el) => {
+            el.disabled = disabled;
+        });
+        if (disabled) applyVanillaSpiceColors();
+    }
+
+    if (isThemeDisabled) {
+        setThemeStylesDisabled(true);
+        document.documentElement.dataset.m3eDisabled = "1";
+    }
+
     while (!window.Spicetify?.Player) {
         await new Promise((r) => setTimeout(r, 250));
+    }
+
+    if (isThemeDisabled) {
+        setThemeStylesDisabled(true);
     }
 
     const STORAGE_KEY = "m3e_color_mode"; // "impulse" | "track"
@@ -339,6 +397,296 @@
         if (card) applyCardColor(card);
     }, { passive: true });
 
+    function ensureCoreUiStyle() {
+        if (document.getElementById("m3e-core-ui-style")) return;
+        const st = document.createElement("style");
+        st.id = "m3e-core-ui-style";
+        st.textContent = `
+            #m3e-settings-section,
+            #m3e-style-row,
+            #m3e-style-row .x-settings-secondColumn {
+                overflow: visible !important;
+            }
+            .m3e-row-disabled {
+                opacity: 0.44 !important;
+                pointer-events: none !important;
+                transition: opacity 0.2s ease !important;
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-wrapper {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                width: 42px;
+                height: 24px;
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-input {
+                position: absolute;
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-indicatorWrapper {
+                position: relative;
+                display: block;
+                width: 42px;
+                height: 24px;
+                border-radius: 9999px;
+                background-color: #535353;
+                transition: background-color 0.2s ease;
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-indicator {
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: #ffffff;
+                transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-input:checked ~ .x-toggle-indicatorWrapper {
+                background-color: #1ed760;
+            }
+            html[data-m3e-disabled="1"] #m3e-settings-section .x-toggle-input:checked ~ .x-toggle-indicatorWrapper .x-toggle-indicator {
+                transform: translateX(18px);
+            }
+            .m3e-dd {
+                position: relative;
+                display: inline-block;
+            }
+            .m3e-dd-trigger {
+                height: 36px;
+                min-width: 190px;
+                padding: 0 12px 0 14px;
+                border-radius: 12px;
+                border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.55);
+                background-color: var(--spice-m3-surface-high, #282828);
+                color: var(--spice-m3-on-surface, #ffffff);
+                font: inherit;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                cursor: pointer;
+                transition: background-color 0.16s ease, border-color 0.16s ease;
+            }
+            .m3e-dd-trigger:hover:not(:disabled) {
+                background-color: var(--spice-m3-surface-highest, #333333);
+                border-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.65);
+            }
+            .m3e-dd-trigger[aria-expanded="true"] {
+                border-color: var(--spice-m3-primary, #b8cac5);
+                background-color: var(--spice-m3-surface-highest, #333333);
+            }
+            .m3e-dd-chevron {
+                width: 16px;
+                height: 16px;
+                flex-shrink: 0;
+                transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .m3e-dd-trigger[aria-expanded="true"] .m3e-dd-chevron {
+                transform: rotate(180deg);
+            }
+            .m3e-dd-menu {
+                position: absolute;
+                top: calc(100% + 6px);
+                right: 0;
+                min-width: 215px;
+                padding: 6px;
+                border-radius: 16px;
+                background-color: var(--spice-m3-surface-highest, #2e2e2e);
+                border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.45);
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+                z-index: 9999;
+                display: none;
+                flex-direction: column;
+                gap: 2px;
+                transform-origin: top right;
+            }
+            .m3e-dd.is-open .m3e-dd-menu {
+                display: flex;
+                animation: m3eDdIn 0.16s cubic-bezier(0.2, 0, 0, 1);
+            }
+            @keyframes m3eDdIn {
+                from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+                to   { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            .m3e-dd-opt {
+                width: 100%;
+                border: none;
+                border-radius: 10px;
+                padding: 9px 12px;
+                background: transparent;
+                color: var(--spice-m3-on-surface, #ffffff);
+                font: inherit;
+                font-size: 13.5px;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                cursor: pointer;
+                transition: background-color 0.14s ease, color 0.14s ease;
+            }
+            .m3e-dd-opt:hover {
+                background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.12);
+            }
+            .m3e-dd-opt[aria-selected="true"] {
+                background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.22);
+                color: var(--spice-m3-primary, #b8cac5);
+                font-weight: 600;
+            }
+            .m3e-dd-check {
+                width: 16px;
+                height: 16px;
+                opacity: 0;
+                flex-shrink: 0;
+            }
+            .m3e-dd-opt[aria-selected="true"] .m3e-dd-check {
+                opacity: 1;
+            }
+            .m3e-modal-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+                background: rgba(0, 0, 0, 0.65);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                animation: m3eFadeIn 0.16s ease;
+            }
+            @keyframes m3eFadeIn {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+            .m3e-modal-card {
+                width: 100%;
+                max-width: 400px;
+                padding: 24px;
+                border-radius: 24px;
+                background-color: var(--spice-m3-surface-high, #242424);
+                color: var(--spice-m3-on-surface, #ffffff);
+                border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.45);
+                box-shadow: 0 20px 56px rgba(0, 0, 0, 0.65);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .m3e-modal-title {
+                margin: 0;
+                font-size: 20px;
+                font-weight: 700;
+                line-height: 1.25;
+                color: var(--spice-m3-on-surface, #ffffff);
+            }
+            .m3e-modal-desc {
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.45;
+                color: var(--spice-m3-on-surface-var, #b3b3b3);
+            }
+            .m3e-modal-actions {
+                margin-top: 8px;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+            .m3e-modal-btn {
+                border: none;
+                border-radius: 9999px;
+                padding: 9px 18px;
+                font: inherit;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease, background-color 0.15s ease;
+            }
+            .m3e-modal-btn:active {
+                transform: scale(0.95);
+            }
+            .m3e-modal-btn-later {
+                background-color: rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.25);
+                color: var(--spice-m3-on-surface, #ffffff);
+            }
+            .m3e-modal-btn-later:hover {
+                background-color: rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.4);
+            }
+            .m3e-modal-btn-now {
+                background-color: var(--spice-m3-primary, #1db954);
+                color: var(--spice-m3-on-primary, #000000);
+            }
+            .m3e-modal-btn-now:hover {
+                opacity: 0.92;
+                transform: scale(1.03);
+            }
+        `;
+        document.head.appendChild(st);
+    }
+
+    function showReloadModal() {
+        ensureCoreUiStyle();
+        document.getElementById("m3e-reload-modal")?.remove();
+
+        const backdrop = document.createElement("div");
+        backdrop.id = "m3e-reload-modal";
+        backdrop.className = "m3e-modal-backdrop";
+        backdrop.innerHTML = `
+            <div class="m3e-modal-card" role="dialog" aria-modal="true" aria-labelledby="m3e-reload-title">
+                <h3 id="m3e-reload-title" class="m3e-modal-title">Перезагрузить Spotify?</h3>
+                <p class="m3e-modal-desc">Включение или отключение темы M3 Expressive вступит в силу после перезапуска интерфейса.</p>
+                <div class="m3e-modal-actions">
+                    <button type="button" class="m3e-modal-btn m3e-modal-btn-later">Reload later</button>
+                    <button type="button" class="m3e-modal-btn m3e-modal-btn-now">Reload now</button>
+                </div>
+            </div>
+        `;
+
+        const close = () => {
+            document.removeEventListener("keydown", onEsc);
+            backdrop.remove();
+        };
+        const onEsc = (e) => { if (e.key === "Escape") close(); };
+
+        backdrop.addEventListener("click", (e) => {
+            if (e.target === backdrop) close();
+        });
+        backdrop.querySelector(".m3e-modal-btn-later").addEventListener("click", close);
+        backdrop.querySelector(".m3e-modal-btn-now").addEventListener("click", () => {
+            window.location.reload();
+        });
+        document.addEventListener("keydown", onEsc);
+        document.body.appendChild(backdrop);
+    }
+
+    if (!window.__m3eGlobalDdBound) {
+        window.__m3eGlobalDdBound = true;
+        document.addEventListener("click", (e) => {
+            const dd = document.getElementById("m3e-style-dropdown");
+            if (!dd || !dd.classList.contains("is-open")) return;
+            if (!e.target?.closest?.("#m3e-style-dropdown")) {
+                dd.classList.remove("is-open");
+                dd.querySelector("#m3e-style-trigger")?.setAttribute("aria-expanded", "false");
+            }
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key !== "Escape") return;
+            const dd = document.getElementById("m3e-style-dropdown");
+            if (dd && dd.classList.contains("is-open")) {
+                dd.classList.remove("is-open");
+                dd.querySelector("#m3e-style-trigger")?.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+
+    const STYLE_LABELS = {
+        tonal: "Сбалансированный",
+        expressive: "Контрастный",
+        vibrant: "Яркий",
+        content: "Цвет обложки"
+    };
+
     function modeDescText(mode) {
         return mode === "track"
             ? "Интерфейс подстраивается под текущий трек"
@@ -352,95 +700,149 @@
             document.querySelector(".x-settings-row")?.closest(".x-settings-section");
         if (!firstSec || !firstSec.parentElement) return false;
 
+        ensureCoreUiStyle();
+
+        const themeEnabled = !getThemeDisabled();
         const mode = getMode();
         const isTrack = mode === "track";
+        const subEnabled = themeEnabled && isTrack;
         const plusOn = getExpressivePlus();
         const curStyle = getPaletteStyle();
+
         const sec = document.createElement("div");
         sec.id = "m3e-settings-section";
         sec.className = "x-settings-section";
 
+        const optionsHtml = Object.entries(STYLE_LABELS).map(([val, label]) => `
+            <button type="button" class="m3e-dd-opt" role="option" data-value="${val}" aria-selected="${curStyle === val ? "true" : "false"}">
+                <span>${label}</span>
+                <svg class="m3e-dd-check" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+            </button>
+        `).join("");
+
         sec.innerHTML = `
             <div class="x-settings-headerContainer">
-                <h2 class="encore-text encore-text-title-small" style="color: var(--spice-m3-primary, #b8cac5);">M3 Expressive</h2>
+                <h2 class="encore-text encore-text-title-small" style="${themeEnabled ? "color: var(--spice-m3-primary, #b8cac5);" : ""}">M3 Expressive</h2>
             </div>
             <div class="x-settings-row" data-settings-row="true">
+                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
+                    <label class="encore-text encore-text-body-medium" for="m3e-master-toggle" style="cursor: pointer;">
+                        Включить M3 Expressive
+                    </label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
+                        Отключение вернёт стандартный вид Spotify после перезагрузки
+                    </span>
+                </div>
+                <div class="x-settings-secondColumn">
+                    <label class="x-toggle-wrapper" style="cursor: pointer;">
+                        <input id="m3e-master-toggle" type="checkbox" class="x-toggle-input" ${themeEnabled ? "checked" : ""}>
+                        <span class="x-toggle-indicatorWrapper">
+                            <span class="x-toggle-indicator"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <div id="m3e-track-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <label class="encore-text encore-text-body-medium" for="m3e-track-mode-toggle" style="cursor: pointer;">
                         Цвета от обложки трека
                     </label>
-                    <span id="m3e-mode-desc" class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #c7c6c5);">
+                    <span id="m3e-mode-desc" class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
                         ${modeDescText(mode)}
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
-                        <input id="m3e-track-mode-toggle" type="checkbox" class="x-toggle-input" ${isTrack ? "checked" : ""}>
+                        <input id="m3e-track-mode-toggle" type="checkbox" class="x-toggle-input" ${isTrack ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
                         <span class="x-toggle-indicatorWrapper">
                             <span class="x-toggle-indicator"></span>
                         </span>
                     </label>
                 </div>
             </div>
-            <div id="m3e-plus-row" class="x-settings-row ${isTrack ? "" : "m3e-row-disabled"}" data-settings-row="true">
+            <div id="m3e-plus-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <label class="encore-text encore-text-body-medium" for="m3e-expressive-plus-toggle" style="cursor: pointer;">
                         Expressive+
                     </label>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #c7c6c5);">
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
                         Подсветка плиток и карточек в цвет их обложки
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
-                        <input id="m3e-expressive-plus-toggle" type="checkbox" class="x-toggle-input" ${plusOn ? "checked" : ""} ${isTrack ? "" : "disabled"}>
+                        <input id="m3e-expressive-plus-toggle" type="checkbox" class="x-toggle-input" ${plusOn ? "checked" : ""} ${subEnabled ? "" : "disabled"}>
                         <span class="x-toggle-indicatorWrapper">
                             <span class="x-toggle-indicator"></span>
                         </span>
                     </label>
                 </div>
             </div>
-            <div id="m3e-style-row" class="x-settings-row ${isTrack ? "" : "m3e-row-disabled"}" data-settings-row="true">
+            <div id="m3e-style-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <label class="encore-text encore-text-body-medium" for="m3e-style-select">
+                    <span class="encore-text encore-text-body-medium">
                         Стиль палитры
-                    </label>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #c7c6c5);">
+                    </span>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
                         Задаёт яркость и контраст оттенков
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
-                    <select id="m3e-style-select" class="main-dropDown-dropDown" ${isTrack ? "" : "disabled"}>
-                        <option value="tonal" ${curStyle === "tonal" ? "selected" : ""}>Сбалансированный</option>
-                        <option value="expressive" ${curStyle === "expressive" ? "selected" : ""}>Контрастный</option>
-                        <option value="vibrant" ${curStyle === "vibrant" ? "selected" : ""}>Яркий</option>
-                        <option value="content" ${curStyle === "content" ? "selected" : ""}>Цвет обложки</option>
-                    </select>
+                    <div id="m3e-style-dropdown" class="m3e-dd">
+                        <button type="button" id="m3e-style-trigger" class="m3e-dd-trigger" aria-haspopup="listbox" aria-expanded="false" ${subEnabled ? "" : "disabled"}>
+                            <span id="m3e-style-trigger-text">${STYLE_LABELS[curStyle] || STYLE_LABELS.tonal}</span>
+                            <svg class="m3e-dd-chevron" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 5.22a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L3.22 6.28a.75.75 0 0 1 1.06-1.06L8 8.94l3.72-3.72a.75.75 0 0 1 1.06 0z"/></svg>
+                        </button>
+                        <div class="m3e-dd-menu" role="listbox">${optionsHtml}</div>
+                    </div>
                 </div>
             </div>
         `;
 
         firstSec.parentElement.insertBefore(sec, firstSec);
 
+        const masterToggle = sec.querySelector("#m3e-master-toggle");
+        const trackRow = sec.querySelector("#m3e-track-row");
         const toggle = sec.querySelector("#m3e-track-mode-toggle");
         const desc = sec.querySelector("#m3e-mode-desc");
         const plusRow = sec.querySelector("#m3e-plus-row");
         const plusToggle = sec.querySelector("#m3e-expressive-plus-toggle");
         const styleRow = sec.querySelector("#m3e-style-row");
-        const styleSelect = sec.querySelector("#m3e-style-select");
+        const dd = sec.querySelector("#m3e-style-dropdown");
+        const ddTrigger = sec.querySelector("#m3e-style-trigger");
+        const ddText = sec.querySelector("#m3e-style-trigger-text");
 
-        const updateDependentState = (trackEnabled) => {
-            plusToggle.disabled = !trackEnabled;
-            styleSelect.disabled = !trackEnabled;
-            plusRow.classList.toggle("m3e-row-disabled", !trackEnabled);
-            styleRow.classList.toggle("m3e-row-disabled", !trackEnabled);
+        const updateDependentState = () => {
+            const on = masterToggle.checked;
+            const trk = toggle.checked;
+            const sub = on && trk;
+
+            toggle.disabled = !on;
+            trackRow.classList.toggle("m3e-row-disabled", !on);
+
+            plusToggle.disabled = !sub;
+            ddTrigger.disabled = !sub;
+            plusRow.classList.toggle("m3e-row-disabled", !sub);
+            styleRow.classList.toggle("m3e-row-disabled", !sub);
+            if (!sub) {
+                dd.classList.remove("is-open");
+                ddTrigger.setAttribute("aria-expanded", "false");
+            }
         };
 
+        masterToggle.addEventListener("change", () => {
+            const val = masterToggle.checked ? "0" : "1";
+            try { localStorage.setItem(DISABLED_KEY, val); } catch {}
+            updateDependentState();
+            showReloadModal();
+        });
+
         toggle.addEventListener("change", async () => {
+            if (isThemeDisabled) return;
             const next = toggle.checked ? "track" : "impulse";
             saveMode(next);
             desc.textContent = modeDescText(next);
-            updateDependentState(next === "track");
+            updateDependentState();
             syncPlusState();
             if (next === "track") {
                 await applyTrackPalette();
@@ -452,6 +854,7 @@
         });
 
         plusToggle.addEventListener("change", () => {
+            if (isThemeDisabled) return;
             saveExpressivePlus(plusToggle.checked);
             syncPlusState();
             Spicetify.showNotification(
@@ -461,12 +864,29 @@
             );
         });
 
-        styleSelect.addEventListener("change", async () => {
-            savePaletteStyle(styleSelect.value);
-            if (getMode() === "track") {
-                await applyTrackPalette();
-            }
-            Spicetify.showNotification("Стиль палитры: " + styleSelect.options[styleSelect.selectedIndex].text, false, 1200);
+        ddTrigger.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (ddTrigger.disabled) return;
+            const open = dd.classList.toggle("is-open");
+            ddTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+
+        dd.querySelectorAll(".m3e-dd-opt").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+                const val = btn.dataset.value;
+                const label = STYLE_LABELS[val] || val;
+                savePaletteStyle(val);
+                ddText.textContent = label;
+                dd.querySelectorAll(".m3e-dd-opt").forEach((o) => {
+                    o.setAttribute("aria-selected", o === btn ? "true" : "false");
+                });
+                dd.classList.remove("is-open");
+                ddTrigger.setAttribute("aria-expanded", "false");
+                if (!isThemeDisabled && getMode() === "track") {
+                    await applyTrackPalette();
+                }
+                Spicetify.showNotification("Стиль палитры: " + label, false, 1200);
+            });
         });
 
         return true;
@@ -497,6 +917,7 @@
     scheduleSettingsInject();
 
     Spicetify.Player.addEventListener("songchange", () => {
+        if (isThemeDisabled) return;
         const pb = document.querySelector(".main-nowPlayingBar-center .playback-bar");
         if (pb) {
             pb.classList.add("m3-instant");
@@ -517,16 +938,21 @@
         }
     }
 
-    syncPlusState();
-    if (getMode() === "track") applyInitialTrackPalette();
+    if (!isThemeDisabled) {
+        syncPlusState();
+        if (getMode() === "track") applyInitialTrackPalette();
+    }
 })();
 
 /* M3E_STARTUP_REPAINT */
-setTimeout(() => window.dispatchEvent(new Event("resize")), 400);
-setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
+if (localStorage.getItem("m3e_theme_disabled") !== "1") {
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 400);
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
+}
 
 /* M3E_FOCUS_SNAP_START */
 (() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const snapProgress = () => {
         const pb = document.querySelector(".main-nowPlayingBar-center .playback-bar");
         if (!pb) return;
@@ -546,6 +972,7 @@ setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
 
 /* M3E_PROFILE_MENU_CLEAN_START */
 (() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка)$/i;
     const cleanMenus = (root) => {
         if (!root || root.nodeType !== 1) return;
@@ -581,6 +1008,7 @@ setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
 
 /* M3E_DJ_RECOLOR_START */
 (() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const GREEN_RE = /rgb\(\s*(?:29,\s*185,\s*84|30,\s*215,\s*96|31,\s*223,\s*100|25,\s*230,\s*140|26,\s*188,\s*84)\s*\)|#(?:1db954|1ed760|1fdf64|19e68c|1abc54)/i;
     const recolorDj = () => {
         const bar = document.querySelector(".main-nowPlayingBar-right");
