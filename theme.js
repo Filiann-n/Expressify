@@ -243,7 +243,7 @@
             sat = Math.max(12, Math.min(94, rawS));
             bgSat = Math.min(32, Math.max(4, Math.round(rawS * 0.34)));
         } else {
-            // tonal (стандарт Google)
+            // tonal (default)
             sat = Math.max(38, Math.min(78, rawS < 18 ? 22 : rawS));
             bgSat = Math.min(18, Math.max(6, Math.round(sat * 0.22)));
         }
@@ -626,6 +626,57 @@
         document.head.appendChild(st);
     }
 
+    const IS_RU = /^ru/i.test(navigator.language || Spicetify.Locale?.getLocale?.() || "");
+    const STR = IS_RU ? {
+        reloadTitle: "Перезагрузить Spotify?",
+        reloadDesc: "Включение или отключение M3 Expressive вступит в силу после перезапуска интерфейса.",
+        reloadLater: "Позже",
+        reloadNow: "Перезагрузить",
+        enableLabel: "Включить M3 Expressive",
+        enableDesc: "Отключение вернёт стандартный вид Spotify после перезагрузки",
+        trackLabel: "Цвета от обложки трека",
+        trackOnDesc: "Интерфейс подстраивается под текущий трек",
+        trackOffDesc: "Используется палитра системных обоев",
+        plusDesc: "Подсветка плиток и карточек в цвет их обложки",
+        styleLabel: "Стиль палитры",
+        styleDesc: "Задаёт яркость и контраст оттенков",
+        styles: {
+            tonal: "Сбалансированный",
+            expressive: "Контрастный",
+            vibrant: "Яркий",
+            content: "Цвет обложки"
+        },
+        toastTrack: "Цвета: обложка трека",
+        toastWallpaper: "Цвета: системные обои",
+        toastPlusOn: "Expressive+ включён",
+        toastPlusOff: "Expressive+ выключен",
+        toastStyle: "Стиль палитры: "
+    } : {
+        reloadTitle: "Reload Spotify?",
+        reloadDesc: "Enabling or disabling M3 Expressive takes effect after reloading the interface.",
+        reloadLater: "Reload later",
+        reloadNow: "Reload now",
+        enableLabel: "Enable M3 Expressive",
+        enableDesc: "Disabling restores the default Spotify look after reload",
+        trackLabel: "Dynamic track colors",
+        trackOnDesc: "Match interface palette to the current track artwork",
+        trackOffDesc: "Using system wallpaper palette",
+        plusDesc: "Tint Home tiles and cards with their artwork",
+        styleLabel: "Palette style",
+        styleDesc: "Controls accent saturation and contrast",
+        styles: {
+            tonal: "Balanced",
+            expressive: "Contrast",
+            vibrant: "Vibrant",
+            content: "Cover match"
+        },
+        toastTrack: "Colors: track artwork",
+        toastWallpaper: "Colors: system wallpaper",
+        toastPlusOn: "Expressive+ enabled",
+        toastPlusOff: "Expressive+ disabled",
+        toastStyle: "Palette style: "
+    };
+
     function showReloadModal() {
         ensureCoreUiStyle();
         document.getElementById("m3e-reload-modal")?.remove();
@@ -635,11 +686,11 @@
         backdrop.className = "m3e-modal-backdrop";
         backdrop.innerHTML = `
             <div class="m3e-modal-card" role="dialog" aria-modal="true" aria-labelledby="m3e-reload-title">
-                <h3 id="m3e-reload-title" class="m3e-modal-title">Перезагрузить Spotify?</h3>
-                <p class="m3e-modal-desc">Включение или отключение темы M3 Expressive вступит в силу после перезапуска интерфейса.</p>
+                <h3 id="m3e-reload-title" class="m3e-modal-title">${STR.reloadTitle}</h3>
+                <p class="m3e-modal-desc">${STR.reloadDesc}</p>
                 <div class="m3e-modal-actions">
-                    <button type="button" class="m3e-modal-btn m3e-modal-btn-later">Reload later</button>
-                    <button type="button" class="m3e-modal-btn m3e-modal-btn-now">Reload now</button>
+                    <button type="button" class="m3e-modal-btn m3e-modal-btn-later">${STR.reloadLater}</button>
+                    <button type="button" class="m3e-modal-btn m3e-modal-btn-now">${STR.reloadNow}</button>
                 </div>
             </div>
         `;
@@ -681,17 +732,8 @@
         });
     }
 
-    const STYLE_LABELS = {
-        tonal: "Сбалансированный",
-        expressive: "Контрастный",
-        vibrant: "Яркий",
-        content: "Цвет обложки"
-    };
-
     function modeDescText(mode) {
-        return mode === "track"
-            ? "Интерфейс подстраивается под текущий трек"
-            : "Используется палитра системных обоев";
+        return mode === "track" ? STR.trackOnDesc : STR.trackOffDesc;
     }
 
     function tryInjectSettings() {
@@ -714,7 +756,7 @@
         sec.id = "m3e-settings-section";
         sec.className = "x-settings-section";
 
-        const optionsHtml = Object.entries(STYLE_LABELS).map(([val, label]) => `
+        const optionsHtml = Object.entries(STR.styles).map(([val, label]) => `
             <button type="button" class="m3e-dd-opt" role="option" data-value="${val}" aria-selected="${curStyle === val ? "true" : "false"}">
                 <span>${label}</span>
                 <svg class="m3e-dd-check" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
@@ -728,10 +770,10 @@
             <div class="x-settings-row" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <label class="encore-text encore-text-body-medium" for="m3e-master-toggle" style="cursor: pointer;">
-                        Включить M3 Expressive
+                        ${STR.enableLabel}
                     </label>
                     <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        Отключение вернёт стандартный вид Spotify после перезагрузки
+                        ${STR.enableDesc}
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
@@ -746,7 +788,7 @@
             <div id="m3e-track-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <label class="encore-text encore-text-body-medium" for="m3e-track-mode-toggle" style="cursor: pointer;">
-                        Цвета от обложки трека
+                        ${STR.trackLabel}
                     </label>
                     <span id="m3e-mode-desc" class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
                         ${modeDescText(mode)}
@@ -767,7 +809,7 @@
                         Expressive+
                     </label>
                     <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        Подсветка плиток и карточек в цвет их обложки
+                        ${STR.plusDesc}
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
@@ -782,16 +824,16 @@
             <div id="m3e-style-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <span class="encore-text encore-text-body-medium">
-                        Стиль палитры
+                        ${STR.styleLabel}
                     </span>
                     <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        Задаёт яркость и контраст оттенков
+                        ${STR.styleDesc}
                     </span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <div id="m3e-style-dropdown" class="m3e-dd">
                         <button type="button" id="m3e-style-trigger" class="m3e-dd-trigger" aria-haspopup="listbox" aria-expanded="false" ${subEnabled ? "" : "disabled"}>
-                            <span id="m3e-style-trigger-text">${STYLE_LABELS[curStyle] || STYLE_LABELS.tonal}</span>
+                            <span id="m3e-style-trigger-text">${STR.styles[curStyle] || STR.styles.tonal}</span>
                             <svg class="m3e-dd-chevron" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 5.22a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L3.22 6.28a.75.75 0 0 1 1.06-1.06L8 8.94l3.72-3.72a.75.75 0 0 1 1.06 0z"/></svg>
                         </button>
                         <div class="m3e-dd-menu" role="listbox">${optionsHtml}</div>
@@ -847,10 +889,10 @@
             syncPlusState();
             if (next === "track") {
                 await applyTrackPalette();
-                Spicetify.showNotification("Цвета: обложка трека", false, 1200);
+                Spicetify.showNotification(STR.toastTrack, false, 1200);
             } else {
                 clearTrackOverrides();
-                Spicetify.showNotification("Цвета: системные обои", false, 1200);
+                Spicetify.showNotification(STR.toastWallpaper, false, 1200);
             }
         });
 
@@ -859,7 +901,7 @@
             saveExpressivePlus(plusToggle.checked);
             syncPlusState();
             Spicetify.showNotification(
-                plusToggle.checked ? "Expressive+ включён" : "Expressive+ выключен",
+                plusToggle.checked ? STR.toastPlusOn : STR.toastPlusOff,
                 false,
                 1200
             );
@@ -875,7 +917,7 @@
         dd.querySelectorAll(".m3e-dd-opt").forEach((btn) => {
             btn.addEventListener("click", async () => {
                 const val = btn.dataset.value;
-                const label = STYLE_LABELS[val] || val;
+                const label = STR.styles[val] || val;
                 savePaletteStyle(val);
                 ddText.textContent = label;
                 dd.querySelectorAll(".m3e-dd-opt").forEach((o) => {
@@ -886,7 +928,7 @@
                 if (!isThemeDisabled && getMode() === "track") {
                     await applyTrackPalette();
                 }
-                Spicetify.showNotification("Стиль палитры: " + label, false, 1200);
+                Spicetify.showNotification(STR.toastStyle + label, false, 1200);
             });
         });
 
@@ -945,13 +987,13 @@
     }
 })();
 
-/* M3E_STARTUP_REPAINT */
+// Trigger initial layout repaint
 if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     setTimeout(() => window.dispatchEvent(new Event("resize")), 400);
     setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
 }
 
-/* M3E_FOCUS_SNAP_START */
+// Snap progress bar on window focus and seek
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const snapProgress = () => {
@@ -969,9 +1011,8 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         if (e.target?.closest?.(".playback-bar")) snapProgress();
     }, true);
 })();
-/* M3E_FOCUS_SNAP_END */
 
-/* M3E_PROFILE_MENU_CLEAN_START */
+// Hide Premium upsell and Support links in profile menu
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка)$/i;
@@ -1005,9 +1046,8 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     });
     menuObs.observe(document.body, { childList: true, subtree: true });
 })();
-/* M3E_PROFILE_MENU_CLEAN_END */
 
-/* M3E_DJ_RECOLOR_START */
+// Recolor Spotify green DJ accents to theme primary
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const GREEN_RE = /rgba?\(\s*(?:29,\s*185,\s*84|30,\s*215,\s*96|31,\s*223,\s*100|25,\s*230,\s*140|26,\s*188,\s*84|59,\s*228,\s*119)(?:\s*,\s*[\d.]+)?\s*\)|#(?:1db954|1ed760|1fdf64|19e68c|1abc54|3be477)(?:[0-9a-f]{2})?/i;
@@ -1095,4 +1135,3 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         Spicetify.Player.addEventListener("songchange", () => setTimeout(recolorDj, 180));
     }
 })();
-/* M3E_DJ_RECOLOR_END */

@@ -1,6 +1,7 @@
 *.bak
 *.bak*
 .last-colors-hash
+.m3e-prev-theme
 *.log
 *.tmp
 Thumbs.db

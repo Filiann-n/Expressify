@@ -5,7 +5,11 @@ param(
     [switch]$NoRestart
 )
 
-$themeDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$themeDir = if (Test-Path (Join-Path $PSScriptRoot "color.ini")) {
+    $PSScriptRoot
+} else {
+    Split-Path -Parent $PSScriptRoot
+}
 
 function Format-HexClean([string]$val, [string]$fallback) {
     if ($val -and ($val -match '^#?[0-9a-fA-F]{6}$')) { return $val.TrimStart('#').ToLower() }
@@ -50,8 +54,8 @@ function Hue2Rgb([double]$p, [double]$q, [double]$t) {
 
 function Convert-HslToHex([int]$h, [int]$s, [int]$l) {
     $hd = ((($h % 360) + 360) % 360) / 360.0
-    $sd = [Math]::Clamp($s, 0, 100) / 100.0
-    $ld = [Math]::Clamp($l, 0, 100) / 100.0
+    $sd = [Math]::Max(0, [Math]::Min(100, $s)) / 100.0
+    $ld = [Math]::Max(0, [Math]::Min(100, $l)) / 100.0
 
     if ($sd -eq 0.0) {
         $r = $ld; $g = $ld; $b = $ld
@@ -63,9 +67,9 @@ function Convert-HslToHex([int]$h, [int]$s, [int]$l) {
         $b = Hue2Rgb $p $q ($hd - 1.0 / 3.0)
     }
 
-    $ri = [Math]::Clamp([int][Math]::Round($r * 255.0), 0, 255)
-    $gi = [Math]::Clamp([int][Math]::Round($g * 255.0), 0, 255)
-    $bi = [Math]::Clamp([int][Math]::Round($b * 255.0), 0, 255)
+    $ri = [Math]::Max(0, [Math]::Min(255, [int][Math]::Round($r * 255.0)))
+    $gi = [Math]::Max(0, [Math]::Min(255, [int][Math]::Round($g * 255.0)))
+    $bi = [Math]::Max(0, [Math]::Min(255, [int][Math]::Round($b * 255.0)))
     return ("{0:x2}{1:x2}{2:x2}" -f $ri, $gi, $bi)
 }
 
@@ -189,7 +193,7 @@ function Get-WallpaperSeedRgb([string]$imgPath) {
 $c = $null
 $sourceLabel = ""
 
-# 1. ii-windows (colors.json)
+# 1. ii-windows / Quickshell colors.json
 $iiPath = "$env:LOCALAPPDATA\quickshell\State\user\generated\colors.json"
 if (Test-Path $iiPath) {
     try {
@@ -201,7 +205,7 @@ if (Test-Path $iiPath) {
     } catch {}
 }
 
-# 2. matugen (если установлен)
+# 2. matugen (if available)
 $wpPath = Get-ActiveWallpaperPath
 if (-not $c -and $wpPath) {
     $matExe = (Get-Command matugen -ErrorAction SilentlyContinue).Source
@@ -234,19 +238,19 @@ if (-not $c -and $wpPath) {
     }
 }
 
-# 3. Системные обои Windows (.NET)
+# 3. Native Windows wallpaper via .NET
 if (-not $c -and $wpPath) {
     try {
         $seedRgb = Get-WallpaperSeedRgb $wpPath
         if ($seedRgb) {
             $c = Build-PaletteFromRgb $seedRgb $Style
             $seedHex = "#{0:x2}{1:x2}{2:x2}" -f $seedRgb[0], $seedRgb[1], $seedRgb[2]
-            $sourceLabel = "Windows Wallpaper ($seedHex, $Style)"
+            $sourceLabel = "Windows wallpaper ($seedHex, $Style)"
         }
     } catch {}
 }
 
-# 4. Фоллбэк на системный AccentColor Windows
+# 4. Windows DWM AccentColor fallback
 if (-not $c) {
     $dwm = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\DWM" -Name AccentColor -ErrorAction SilentlyContinue).AccentColor
     if ($null -ne $dwm) {
@@ -302,8 +306,8 @@ m3-on-surface         = $(Format-HexClean $c.on_surface 'e3e2e1')
 m3-on-surface-var     = $(Format-HexClean $c.on_surface_variant 'c7c6c5')
 "@
 
-[System.IO.File]::WriteAllText("$themeDir\color.ini", $ini, [System.Text.UTF8Encoding]::new($false))
-Write-Host "color.ini обновлён! Источник: $sourceLabel" -ForegroundColor Green
+[System.IO.File]::WriteAllText((Join-Path $themeDir "color.ini"), $ini, [System.Text.UTF8Encoding]::new($false))
+Write-Host "Updated color.ini from $sourceLabel" -ForegroundColor Green
 
 if ($Apply) {
     if ($NoRestart) {
