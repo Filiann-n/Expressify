@@ -51,6 +51,11 @@
     if (isThemeDisabled) {
         setThemeStylesDisabled(true);
         document.documentElement.dataset.m3eDisabled = "1";
+    } else {
+        try {
+            document.documentElement.dataset.m3eBorders =
+                localStorage.getItem("m3e_card_borders") === "0" ? "0" : "1";
+        } catch {}
     }
 
     while (!window.Spicetify?.Player) {
@@ -314,6 +319,24 @@
         const active = getMode() === "track" && getExpressivePlus();
         document.documentElement.dataset.m3ePlus = active ? "1" : "0";
         if (active) setTimeout(tintPlayingShortcuts, 80);
+    }
+
+    const BORDERS_KEY = "m3e_card_borders";
+    function getBordersEnabled() {
+        try {
+            const v = Spicetify.LocalStorage?.get?.(BORDERS_KEY);
+            if (v === "0" || v === "1") return v === "1";
+        } catch {}
+        const lv = localStorage.getItem(BORDERS_KEY);
+        return lv === null ? true : lv === "1";
+    }
+    function saveBordersEnabled(on) {
+        const val = on ? "1" : "0";
+        localStorage.setItem(BORDERS_KEY, val);
+        try { Spicetify.LocalStorage?.set?.(BORDERS_KEY, val); } catch {}
+    }
+    function syncBordersState() {
+        document.documentElement.dataset.m3eBorders = getBordersEnabled() ? "1" : "0";
     }
 
     const tileColorCache = new Map();
@@ -669,6 +692,8 @@
         trackOnDesc: "Интерфейс подстраивается под текущий трек",
         trackOffDesc: "Используется палитра системных обоев",
         plusDesc: "Подсветка плиток и карточек в цвет их обложки",
+        bordersLabel: "Обводка карточек",
+        bordersDesc: "Показывать рамку вокруг плиток и карточек",
         styleLabel: "Стиль палитры",
         styleDesc: "Задаёт яркость и контраст оттенков",
         styles: {
@@ -681,6 +706,8 @@
         toastWallpaper: "Цвета: системные обои",
         toastPlusOn: "Expressive+ включён",
         toastPlusOff: "Expressive+ выключен",
+        toastBordersOn: "Обводка карточек включена",
+        toastBordersOff: "Обводка карточек выключена",
         toastStyle: "Стиль палитры: "
     } : {
         reloadTitle: "Reload Spotify?",
@@ -693,6 +720,8 @@
         trackOnDesc: "Match interface palette to the current track artwork",
         trackOffDesc: "Using system wallpaper palette",
         plusDesc: "Tint Home tiles and cards with their artwork",
+        bordersLabel: "Card outlines",
+        bordersDesc: "Show borders around tiles and cards",
         styleLabel: "Palette style",
         styleDesc: "Controls accent saturation and contrast",
         styles: {
@@ -705,6 +734,8 @@
         toastWallpaper: "Colors: system wallpaper",
         toastPlusOn: "Expressive+ enabled",
         toastPlusOff: "Expressive+ disabled",
+        toastBordersOn: "Card outlines enabled",
+        toastBordersOff: "Card outlines disabled",
         toastStyle: "Palette style: "
     };
 
@@ -794,6 +825,7 @@
         const isTrack = mode === "track";
         const subEnabled = themeEnabled && isTrack;
         const plusOn = getExpressivePlus();
+        const bordersOn = getBordersEnabled();
         const curStyle = getPaletteStyle();
 
         const sec = document.createElement("div");
@@ -865,6 +897,24 @@
                     </label>
                 </div>
             </div>
+            <div id="m3e-borders-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
+                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
+                    <label class="encore-text encore-text-body-medium" for="m3e-borders-toggle" style="cursor: pointer;">
+                        ${STR.bordersLabel}
+                    </label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
+                        ${STR.bordersDesc}
+                    </span>
+                </div>
+                <div class="x-settings-secondColumn">
+                    <label class="x-toggle-wrapper" style="cursor: pointer;">
+                        <input id="m3e-borders-toggle" type="checkbox" class="x-toggle-input" ${bordersOn ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
+                        <span class="x-toggle-indicatorWrapper">
+                            <span class="x-toggle-indicator"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
             <div id="m3e-style-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
                 <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
                     <span class="encore-text encore-text-body-medium">
@@ -894,6 +944,8 @@
         const desc = sec.querySelector("#m3e-mode-desc");
         const plusRow = sec.querySelector("#m3e-plus-row");
         const plusToggle = sec.querySelector("#m3e-expressive-plus-toggle");
+        const bordersRow = sec.querySelector("#m3e-borders-row");
+        const bordersToggle = sec.querySelector("#m3e-borders-toggle");
         const styleRow = sec.querySelector("#m3e-style-row");
         const dd = sec.querySelector("#m3e-style-dropdown");
         const ddTrigger = sec.querySelector("#m3e-style-trigger");
@@ -906,6 +958,8 @@
 
             toggle.disabled = !on;
             trackRow.classList.toggle("m3e-row-disabled", !on);
+            bordersToggle.disabled = !on;
+            bordersRow.classList.toggle("m3e-row-disabled", !on);
 
             plusToggle.disabled = !sub;
             ddTrigger.disabled = !sub;
@@ -946,6 +1000,17 @@
             syncPlusState();
             Spicetify.showNotification(
                 plusToggle.checked ? STR.toastPlusOn : STR.toastPlusOff,
+                false,
+                1200
+            );
+        });
+
+        bordersToggle.addEventListener("change", () => {
+            if (isThemeDisabled) return;
+            saveBordersEnabled(bordersToggle.checked);
+            syncBordersState();
+            Spicetify.showNotification(
+                bordersToggle.checked ? STR.toastBordersOn : STR.toastBordersOff,
                 false,
                 1200
             );
@@ -1028,6 +1093,7 @@
 
     if (!isThemeDisabled) {
         syncPlusState();
+        syncBordersState();
         if (getMode() === "track") applyInitialTrackPalette();
     }
 })();
