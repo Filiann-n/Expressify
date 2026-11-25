@@ -5,7 +5,7 @@ A Material 3 Expressive theme for the Spotify desktop client, built for [Spiceti
 ## Requirements
 
 - Desktop Spotify client (standard installer / Scoop on Windows, or native package on Linux; Microsoft Store builds are not supported)
-- **[Spicetify](https://spicetify.app)** already installed
+- **[Spicetify](https://spicetify.app)** installed
 
 > This repo only installs the theme itself. The install scripts check whether `spicetify` is present and will not install Spicetify for you.
 
