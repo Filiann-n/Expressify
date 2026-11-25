@@ -1,3 +1,8 @@
+$themeDir = "$env:APPDATA\spicetify\Themes\M3Expressive"
+Set-Location $themeDir
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+
+$installSh = @'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -14,7 +19,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# === 1. Автопоиск spicetify (даже если он не прописан в текущем PATH) ===
 if ! command -v spicetify >/dev/null 2>&1; then
   for candidate in \
     "$HOME/.spicetify" \
@@ -30,19 +34,8 @@ if ! command -v spicetify >/dev/null 2>&1; then
 fi
 
 if ! command -v spicetify >/dev/null 2>&1; then
-  for candidate in "$HOME/.spicetify" "$HOME/.local/bin" "/usr/local/bin" "/opt/homebrew/bin" "/home/linuxbrew/.linuxbrew/bin"; do
-    if [[ -x "$candidate/spicetify" ]]; then
-      export PATH="$candidate:$PATH"
-      break
-    fi
-  done
-fi
-
-if ! command -v spicetify >/dev/null 2>&1; then
   echo "Spicetify is required to use this theme."
-  echo "Install Spicetify first: https://spicetify.app"
-  echo "Or if it's already installed, add it to your PATH:"
-  echo '  export PATH="$PATH:$HOME/.spicetify"'
+  echo "Install Spicetify first from https://spicetify.app and run this command again."
   exit 1
 fi
 
@@ -57,24 +50,12 @@ download_file() {
   fi
 }
 
-<<<<<<< HEAD
-# === 2. Надёжное определение папки Spicetify ===
-SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
-if [[ -z "$SPICETIFY_USER" ]]; then
-  SPICETIFY_CFG="$(spicetify -c 2>/dev/null | head -n1 || true)"
-  if [[ -n "$SPICETIFY_CFG" ]]; then
-    SPICETIFY_USER="$(dirname "$SPICETIFY_CFG")"
-  else
-    SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
-  fi
-=======
 SPICETIFY_CFG="$(spicetify -c 2>/dev/null | head -n1 || true)"
 if [[ -n "$SPICETIFY_CFG" ]]; then
   SPICETIFY_USER="$(dirname "$SPICETIFY_CFG")"
 else
   SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
   [[ -z "$SPICETIFY_USER" ]] && SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
->>>>>>> 5c231b2 (ohhhhmyy)
 fi
 
 TARGET_DIR="$SPICETIFY_USER/Themes/M3Expressive"
@@ -115,27 +96,32 @@ if [[ "$NO_WALLPAPER_SYNC" -eq 0 && -x "$TARGET_DIR/scripts/sync-wallpaper.sh" ]
   "$TARGET_DIR/scripts/sync-wallpaper.sh" || echo "Wallpaper sync skipped."
 fi
 
-<<<<<<< HEAD
-# === 3. Применение с подсказкой по правам на Linux при ошибке ===
-if [[ "$NO_APPLY" -eq 0 ]]; then
-  if ! spicetify apply; then
-    echo ""
-    echo "⚠️ 'spicetify apply' завершился с ошибкой."
-    echo "На Linux чаще всего требуются права на запись в папку Spotify:"
-    echo "  sudo chmod a+wr /opt/spotify"
-    echo "  sudo chmod a+wr /opt/spotify/Apps -R"
-    echo "После этого выполни: spicetify apply"
-=======
 if [[ "$NO_APPLY" -eq 0 ]]; then
   if ! spicetify apply; then
     echo "spicetify apply failed. On Linux you may need write permissions on Spotify's folder (e.g. chmod a+wr)." >&2
->>>>>>> 5c231b2 (ohhhhmyy)
     exit 1
   fi
 fi
 
-<<<<<<< HEAD
-echo "M3 Expressive installed successfully."
-=======
 echo "M3 Expressive installed."
->>>>>>> 5c231b2 (ohhhhmyy)
+'@ -replace "`r`n", "`n"
+
+[System.IO.File]::WriteAllText("$themeDir\install.sh", $installSh, $utf8NoBom)
+
+# Проверяем, нет ли маркеров конфликта в других файлах перед пушем
+$conflicts = Get-ChildItem -Recurse -File |
+    Where-Object { $_.FullName -notmatch '\\\.git\\' } |
+    Select-String -Pattern '^(<<<<<<< |=======$|>>>>>>> )'
+
+if ($conflicts) {
+    Write-Host "Найдены конфликты в других файлах:" -ForegroundColor Red
+    $conflicts | ForEach-Object { "$($_.Path):$($_.LineNumber): $($_.Line)" }
+    return
+}
+
+$crCheck = ([System.IO.File]::ReadAllBytes("$themeDir\install.sh") -contains 13)
+Write-Host "Conflict check: OK | install.sh LF-only: $(-not $crCheck)" -ForegroundColor Green
+
+git add install.sh
+git commit -m "Fix merge conflict markers in install.sh"
+git push -u origin main
