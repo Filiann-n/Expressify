@@ -2,13 +2,30 @@
 set -euo pipefail
 
 if ! command -v spicetify >/dev/null 2>&1; then
+  for candidate in \
+    "$HOME/.spicetify" \
+    "$HOME/.local/bin" \
+    "/usr/local/bin" \
+    "/opt/homebrew/bin" \
+    "/home/linuxbrew/.linuxbrew/bin"; do
+    if [[ -x "$candidate/spicetify" ]]; then
+      export PATH="$candidate:$PATH"
+      break
+    fi
+  done
+fi
+
+if ! command -v spicetify >/dev/null 2>&1; then
   echo "Spicetify was not found in PATH."
   exit 1
 fi
 
-SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
-if [[ -z "$SPICETIFY_USER" ]]; then
-  SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
+SPICETIFY_CFG="$(spicetify -c 2>/dev/null | head -n1 || true)"
+if [[ -n "$SPICETIFY_CFG" ]]; then
+  SPICETIFY_USER="$(dirname "$SPICETIFY_CFG")"
+else
+  SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
+  [[ -z "$SPICETIFY_USER" ]] && SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
 fi
 
 TARGET_DIR="$SPICETIFY_USER/Themes/M3Expressive"

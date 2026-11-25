@@ -13,8 +13,14 @@ if (-not (Get-Command spicetify -ErrorAction SilentlyContinue)) {
     if ($PSScriptRoot) { exit 1 } else { return }
 }
 
-$spicetifyUser = (spicetify path userdata 2>$null | Select-Object -First 1)
-if ([string]::IsNullOrWhiteSpace($spicetifyUser)) { $spicetifyUser = Join-Path $env:APPDATA "spicetify" }
+$cfgPath = (spicetify -c 2>$null | Select-Object -First 1)
+if (-not [string]::IsNullOrWhiteSpace($cfgPath)) {
+    $spicetifyUser = Split-Path -Parent $cfgPath
+} else {
+    $spicetifyUser = (spicetify path userdata 2>$null | Select-Object -First 1)
+    if ([string]::IsNullOrWhiteSpace($spicetifyUser)) { $spicetifyUser = Join-Path $env:APPDATA "spicetify" }
+}
+
 $targetDir = Join-Path $spicetifyUser "Themes\M3Expressive"
 New-Item -ItemType Directory -Path (Join-Path $targetDir "scripts") -Force | Out-Null
 

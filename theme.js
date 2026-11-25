@@ -61,8 +61,8 @@
         setThemeStylesDisabled(true);
     }
 
-    const STORAGE_KEY = "m3e_color_mode"; // "impulse" | "track"
-    const STYLE_KEY = "m3e_palette_style"; // "tonal" | "expressive" | "vibrant" | "content"
+    const STORAGE_KEY = "m3e_color_mode";
+    const STYLE_KEY = "m3e_palette_style";
     const VARS = [
         "--spice-m3-surface", "--spice-m3-surface-lowest", "--spice-m3-surface-low",
         "--spice-m3-surface-container", "--spice-m3-surface-high", "--spice-m3-surface-highest",
@@ -236,14 +236,13 @@
         } else if (style === "expressive") {
             sat = Math.max(56, Math.min(88, rawS < 18 ? 30 : rawS + 12));
             bgSat = Math.min(24, Math.max(10, Math.round(sat * 0.25)));
-            bgH = (h + 325) % 360;   // сдвиг оттенка поверхности -35° как в Android 16 Expressive
-            secH = (h + 35) % 360;   // контрастные контейнеры +35°
+            bgH = (h + 325) % 360;
+            secH = (h + 35) % 360;
             tertH = (h + 120) % 360;
         } else if (style === "content") {
             sat = Math.max(12, Math.min(94, rawS));
             bgSat = Math.min(32, Math.max(4, Math.round(rawS * 0.34)));
         } else {
-            // tonal (default)
             sat = Math.max(38, Math.min(78, rawS < 18 ? 22 : rawS));
             bgSat = Math.min(18, Math.max(6, Math.round(sat * 0.22)));
         }
@@ -413,7 +412,6 @@
     if (Spicetify.Platform?.History?.listen) {
         Spicetify.Platform.History.listen(() => schedulePrewarm(450));
     }
-    // Повторный прогрев пока Главная подгружает обложки
     setTimeout(prewarmExpressiveCards, 900);
     setTimeout(prewarmExpressiveCards, 2000);
     setTimeout(prewarmExpressiveCards, 3800);
@@ -785,7 +783,7 @@
         if (!firstSec) {
             firstSec =
                 document.querySelector(".x-settings-section:has([data-settings-row])") ||
-                document.querySelector("[data-testid=\"settings-page\"] h2, .x-settings-row")?.closest(".x-settings-section");
+                document.querySelector('[data-testid="settings-page"] h2, .x-settings-row')?.closest(".x-settings-section");
         }
         if (!firstSec || !firstSec.parentElement) return false;
 
@@ -995,7 +993,7 @@
     const obs = new MutationObserver(() => {
         const path = Spicetify.Platform?.History?.location?.pathname || "";
         if (path && path !== "/preferences") return;
-        if (!document.getElementById("m3e-settings-section") && document.querySelector("[data-testid=\"settings-page\"] h2, .x-settings-row")) {
+        if (!document.getElementById("m3e-settings-section") && document.querySelector('[data-testid="settings-page"] h2, .x-settings-row')) {
             scheduleSettingsInject();
         }
     });
@@ -1059,10 +1057,12 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     }, true);
 })();
 
-// Hide Premium upsell and Support links in profile menu
+// Hide upsell, Support, Report and disabled Download items in menus
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка|Report|Пожаловаться)$/i;
+    const DL_RE = /^(Download|Скачать)$/i;
+
     const cleanMenus = (root) => {
         if (!root || root.nodeType !== 1) return;
         const menus = root.matches?.('[role="menu"]')
@@ -1071,14 +1071,17 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         for (const menu of menus) {
             for (const item of menu.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="link"], [class*="-menu-row"], a, button')) {
                 const txt = (item.textContent || "").replace(/\s+/g, " ").trim();
+                const aria = (item.getAttribute?.("aria-label") || "").trim();
                 const href = item.getAttribute?.("href") || "";
                 const isDisabled =
                     item.matches('[aria-disabled="true"], [data-disabled], [data-disabled="true"], :disabled, .QJhiFHy4PAK8GKZ6QM4g') ||
+                    !!item.closest('[aria-disabled="true"], [data-disabled], [data-disabled="true"], .QJhiFHy4PAK8GKZ6QM4g') ||
                     item.hasAttribute("disabled") ||
-                    parseFloat(getComputedStyle(item).opacity) < 0.75;
-                const isDisabledDownload = isDisabled && /^(Download|Скачать)$/i.test(txt);
+                    parseFloat(getComputedStyle(item).opacity) < 0.75 ||
+                    (item.firstElementChild ? parseFloat(getComputedStyle(item.firstElementChild).opacity) < 0.75 : false);
+                const isDisabledDownload = isDisabled && (DL_RE.test(txt) || DL_RE.test(aria));
                 if (HIDE_MENU_RE.test(txt) || isDisabledDownload || /support\.spotify\.com|campaign=upgrade/i.test(href)) {
-                    const row = item.closest('li, .main-contextMenu-menuItem, [role="menuitem"], [role="link"], [class*="-menu-row"]') || item;
+                    const row = item.closest('li, .main-contextMenu-menuItem, [role="menuitem"], [role="menuitemcheckbox"], [role="link"], [class*="-menu-row"]') || item;
                     row.style.setProperty("display", "none", "important");
                 }
             }
@@ -1086,14 +1089,25 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     };
 
     const menuObs = new MutationObserver((muts) => {
+        const menus = new Set();
         for (const m of muts) {
             const t = m.target;
-            if (t !== document.body && !t.closest?.('#context-menu, [data-tippy-root], [role="menu"]')) continue;
-            for (const n of m.addedNodes) {
-                if (n.nodeType === 1 && (n.matches?.('[role="menu"]') || n.querySelector?.('[role="menu"]'))) {
-                    cleanMenus(n);
-                }
+            if (!t || t.nodeType !== 1) continue;
+            const insideMenu = t.closest?.('[role="menu"]');
+            if (insideMenu) {
+                menus.add(insideMenu);
+                continue;
             }
+            if (t.closest?.('#main') && !t.closest?.('[data-encore-id="popover"], #context-menu, [data-tippy-root]')) continue;
+            for (const n of m.addedNodes) {
+                if (n.nodeType !== 1) continue;
+                if (n.matches?.('[role="menu"]')) menus.add(n);
+                else n.querySelectorAll?.('[role="menu"]').forEach((menu) => menus.add(menu));
+            }
+        }
+        for (const menu of menus) {
+            cleanMenus(menu);
+            setTimeout(() => cleanMenus(menu), 80);
         }
     });
     menuObs.observe(document.body, { childList: true, subtree: true });
@@ -1109,8 +1123,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             const m = val.match(/,\s*([\d.]+)\s*\)/);
             if (m && parseFloat(m[1]) < 0.9) return true;
         }
-        if (/^#[0-9a-f]{8}$/i.test(val.trim())) return true;
-        return false;
+        return /^#[0-9a-f]{8}$/i.test(val.trim());
     };
 
     const recolorDj = () => {
@@ -1301,8 +1314,9 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
 
         const mainView = document.querySelector(".Root__main-view");
         if (mainView) {
-            for (const d of mainView.querySelectorAll('div[style*="background-color"]')) {
-                if (d.classList.contains("main-home-homeHeader")) continue;
+            for (const d of mainView.querySelectorAll('div[style*="background-color"]:not(.main-home-homeHeader)')) {
+                if (d.dataset.m3eHdrChecked) continue;
+                d.dataset.m3eHdrChecked = "1";
                 const cs = getComputedStyle(d);
                 if (cs.position === "absolute" && cs.backgroundImage && cs.backgroundImage.includes("linear-gradient")) {
                     const rect = d.getBoundingClientRect();
@@ -1312,27 +1326,39 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                 }
             }
 
-            const homeChip = mainView.querySelector('button[role="checkbox"], [data-encore-id="chip"]');
+            const homeChip = mainView.querySelector('button[role="checkbox"]:not(.m3e-chip-checked), [data-encore-id="chip"]:not(.m3e-chip-checked)');
             if (homeChip) {
-                let cur = homeChip.parentElement;
-                while (cur && cur !== mainView) {
-                    const pos = getComputedStyle(cur).position;
-                    if (pos === "sticky" || pos === "fixed") {
-                        addCls(cur, "main-home-filterChipsContainer");
-                        const backdrop = cur.firstElementChild;
-                        if (backdrop && getComputedStyle(backdrop).position === "absolute") {
-                            addCls(backdrop, "main-home-filterChipsSection");
+                addCls(homeChip, "m3e-chip-checked");
+                const chipGroup = homeChip.closest('[class*="chip-group"]');
+                if (chipGroup) addCls(chipGroup, "m3e-home-chips-row");
+                if (!mainView.querySelector(".main-home-filterChipsContainer")) {
+                    let cur = homeChip.parentElement;
+                    while (cur && cur !== mainView) {
+                        const pos = getComputedStyle(cur).position;
+                        if (pos === "sticky" || pos === "fixed") {
+                            addCls(cur, "main-home-filterChipsContainer");
+                            const backdrop = cur.firstElementChild;
+                            if (backdrop && getComputedStyle(backdrop).position === "absolute") {
+                                addCls(backdrop, "main-home-filterChipsSection");
+                            }
+                            break;
                         }
-                        break;
+                        cur = cur.parentElement;
                     }
-                    cur = cur.parentElement;
+                }
+            }
+
+            for (const a of mainView.querySelectorAll('section[data-testid="component-shelf"] > div:first-child a:not(.main-shelf-seeAll)')) {
+                const href = a.getAttribute("href") || "";
+                if (/\/(section|recents|discography|related)\b/.test(href) && !a.closest("h1, h2")) {
+                    addCls(a, "main-shelf-seeAll");
                 }
             }
         }
 
         const navBar = document.querySelector(".Root__nav-bar");
         if (navBar) {
-            for (const item of navBar.querySelectorAll('[role="listitem"]')) {
+            for (const item of navBar.querySelectorAll('[role="listitem"]:not(.main-yourLibraryX-listItem)')) {
                 addCls(item, "main-yourLibraryX-listItem");
                 const isArtist =
                     !!item.querySelector('[class*="circular" i], [class*="circle" i]') ||
@@ -1397,8 +1423,19 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             }
         }
 
-        for (const c of document.querySelectorAll('[data-encore-id="card"]')) addCls(c, "main-card-card");
-        for (const img of document.querySelectorAll('[data-testid="card-image"]')) {
+        for (const c of document.querySelectorAll('[data-encore-id="card"]:not(.main-card-card)')) {
+            addCls(c, "main-card-card");
+            const pb = c.querySelector('[data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]');
+            if (pb) {
+                const wrap = pb.tagName === "BUTTON" ? pb.parentElement : pb;
+                addCls(wrap, "main-playButton-PlayButton");
+                const slot = wrap?.parentElement;
+                if (slot && slot !== c && getComputedStyle(slot).position === "absolute") {
+                    addCls(slot, "main-card-PlayButtonContainer");
+                }
+            }
+        }
+        for (const img of document.querySelectorAll('[data-testid="card-image"]:not(.main-cardImage-image)')) {
             addCls(img, "main-cardImage-image");
             const imgWrap = img.parentElement;
             addCls(imgWrap, "main-cardImage-imageWrapper");
@@ -1423,8 +1460,28 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         for (const el of document.querySelectorAll('[data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]:not([data-testid="control-button-playpause"])')) {
             addCls(el.tagName === "BUTTON" ? el.parentElement : el, "main-playButton-PlayButton");
         }
-        for (const el of document.querySelectorAll('[data-testid="tracklist-row"]')) addCls(el, "main-trackList-trackListRow");
-        for (const el of document.querySelectorAll('[data-testid="shortcut-card"]')) addCls(el, "view-homeShortcutsGrid-shortcut");
+        for (const el of document.querySelectorAll('[data-testid="tracklist-row"]:not(.main-trackList-trackListRow)')) addCls(el, "main-trackList-trackListRow");
+        for (const el of document.querySelectorAll('[data-testid="shortcut-card"]:not(.view-homeShortcutsGrid-shortcut)')) addCls(el, "view-homeShortcutsGrid-shortcut");
+
+        for (const card of document.querySelectorAll(".e6ssqE0uX8qNAFRRz8rV:not(.m3e-wn-ready)")) {
+            addCls(card, "m3e-wn-ready");
+            const kids = Array.from(card.children);
+            const mediaEl = card.querySelector(".W0HxH4qBfxlGF8ihq8ex, .AMNaKvCRDGoAyl4ltPZg");
+            const mediaSlot = mediaEl ? kids.find((ch) => ch.contains(mediaEl)) : null;
+            if (mediaSlot) addCls(mediaSlot, "m3e-wn-media");
+
+            const titleEl = card.querySelector("h3, [data-testid='listRowTitle']");
+            const headerSlot = titleEl ? kids.find((ch) => ch.contains(titleEl)) : null;
+            if (headerSlot) addCls(headerSlot, "m3e-wn-header");
+
+            const bodyEl = card.querySelector(".gIS5JUiTKLNmvZGDu3ei, .jg8minRucYgGRfA_3Hz1");
+            const bodySlot = bodyEl ? kids.find((ch) => ch.contains(bodyEl)) : null;
+            if (bodySlot) addCls(bodySlot, "m3e-wn-body");
+
+            const footerEl = card.querySelector(".unqqrJbT4kC4bCvEjysi");
+            const footerSlot = footerEl ? kids.find((ch) => ch.contains(footerEl)) : null;
+            if (footerSlot) addCls(footerSlot, "m3e-wn-footer");
+        }
     };
 
     let timer = null;
@@ -1439,8 +1496,39 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         const root = document.getElementById("main");
         if ((root && document.querySelector('[data-testid="now-playing-bar"]')) || ++bootTries >= 25) {
             clearInterval(boot);
-            new MutationObserver(schedule).observe(root || document.body, { childList: true, subtree: true });
+            new MutationObserver((muts) => {
+                for (const m of muts) {
+                    const t = m.target;
+                    if (t && t.nodeType === 1 && !t.closest?.('[data-testid="playback-position"], [data-testid="playback-progressbar"], .playback-bar')) {
+                        schedule();
+                        break;
+                    }
+                }
+            }).observe(root || document.body, { childList: true, subtree: true });
             window.dispatchEvent(new Event("resize"));
         }
     }, 200);
+})();
+
+// Instant Play/Pause shape intent during Spotify audio fade-out
+(() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
+    let clearTimer = null;
+
+    document.addEventListener("click", (e) => {
+        const btn = e.target?.closest?.('[data-testid="control-button-playpause"]');
+        if (!btn) return;
+
+        const isCurrentlyPlaying =
+            btn.classList.contains("m3e-intent-playing") ||
+            (!btn.classList.contains("m3e-intent-paused") && /Pause|Пауз/i.test(btn.getAttribute("aria-label") || ""));
+
+        btn.classList.toggle("m3e-intent-paused", isCurrentlyPlaying);
+        btn.classList.toggle("m3e-intent-playing", !isCurrentlyPlaying);
+
+        clearTimeout(clearTimer);
+        clearTimer = setTimeout(() => {
+            btn.classList.remove("m3e-intent-paused", "m3e-intent-playing");
+        }, 900);
+    }, true);
 })();

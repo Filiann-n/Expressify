@@ -1,8 +1,3 @@
-$themeDir = "$env:APPDATA\spicetify\Themes\M3Expressive"
-Set-Location $themeDir
-$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-
-$installSh = @'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -104,24 +99,3 @@ if [[ "$NO_APPLY" -eq 0 ]]; then
 fi
 
 echo "M3 Expressive installed."
-'@ -replace "`r`n", "`n"
-
-[System.IO.File]::WriteAllText("$themeDir\install.sh", $installSh, $utf8NoBom)
-
-# Проверяем, нет ли маркеров конфликта в других файлах перед пушем
-$conflicts = Get-ChildItem -Recurse -File |
-    Where-Object { $_.FullName -notmatch '\\\.git\\' } |
-    Select-String -Pattern '^(<<<<<<< |=======$|>>>>>>> )'
-
-if ($conflicts) {
-    Write-Host "Найдены конфликты в других файлах:" -ForegroundColor Red
-    $conflicts | ForEach-Object { "$($_.Path):$($_.LineNumber): $($_.Line)" }
-    return
-}
-
-$crCheck = ([System.IO.File]::ReadAllBytes("$themeDir\install.sh") -contains 13)
-Write-Host "Conflict check: OK | install.sh LF-only: $(-not $crCheck)" -ForegroundColor Green
-
-git add install.sh
-git commit -m "Fix merge conflict markers in install.sh"
-git push -u origin main

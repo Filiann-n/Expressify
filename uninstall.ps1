@@ -5,8 +5,14 @@ if (-not (Get-Command spicetify -ErrorAction SilentlyContinue)) {
     if ($PSScriptRoot) { exit 1 } else { return }
 }
 
-$spicetifyUser = (spicetify path userdata 2>$null | Select-Object -First 1)
-if ([string]::IsNullOrWhiteSpace($spicetifyUser)) { $spicetifyUser = Join-Path $env:APPDATA "spicetify" }
+$cfgPath = (spicetify -c 2>$null | Select-Object -First 1)
+if (-not [string]::IsNullOrWhiteSpace($cfgPath)) {
+    $spicetifyUser = Split-Path -Parent $cfgPath
+} else {
+    $spicetifyUser = (spicetify path userdata 2>$null | Select-Object -First 1)
+    if ([string]::IsNullOrWhiteSpace($spicetifyUser)) { $spicetifyUser = Join-Path $env:APPDATA "spicetify" }
+}
+
 $targetDir = Join-Path $spicetifyUser "Themes\M3Expressive"
 $prevFile = Join-Path $targetDir ".m3e-prev-theme"
 
@@ -18,6 +24,10 @@ if (Test-Path $prevFile) {
     Remove-Item $prevFile -Force -ErrorAction SilentlyContinue
 }
 
-spicetify config current_theme $prevTheme color_scheme $prevScheme
+if ($prevTheme) {
+    spicetify config current_theme $prevTheme color_scheme $prevScheme
+} else {
+    spicetify config current_theme "" color_scheme ""
+}
 spicetify apply
 Write-Host "M3 Expressive disabled and previous theme restored." -ForegroundColor Green
