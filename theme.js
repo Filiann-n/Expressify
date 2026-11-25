@@ -384,17 +384,50 @@
     }
 
     function tintPlayingShortcuts() {
-        if (document.documentElement.dataset.m3ePlus !== "1") return;
+        document.querySelectorAll(".m3e-is-playing").forEach((el) => el.classList.remove("m3e-is-playing"));
         const activeCards = document.querySelectorAll(
             '.view-homeShortcutsGrid-shortcut:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]), ' +
-            '.main-card-card:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])'
+            '.main-card-card:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]), ' +
+            '[data-encore-id="card"]:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])'
         );
-        activeCards.forEach((c) => applyCardColor(c));
+        activeCards.forEach((c) => {
+            c.classList.add("m3e-is-playing");
+            if (document.documentElement.dataset.m3ePlus === "1") applyCardColor(c);
+        });
     }
+
+    let prewarmTimer = null;
+    function prewarmExpressiveCards() {
+        if (document.documentElement.dataset.m3ePlus !== "1") return;
+        const cards = document.querySelectorAll(".view-homeShortcutsGrid-shortcut, .main-card-card, [data-encore-id='card']");
+        let i = 0;
+        for (const c of cards) {
+            if (!c.dataset.m3eImg && i++ < 32) applyCardColor(c);
+        }
+    }
+    const schedulePrewarm = (delay = 350) => {
+        if (document.documentElement.dataset.m3ePlus !== "1") return;
+        clearTimeout(prewarmTimer);
+        prewarmTimer = setTimeout(prewarmExpressiveCards, delay);
+    };
+    if (Spicetify.Platform?.History?.listen) {
+        Spicetify.Platform.History.listen(() => schedulePrewarm(450));
+    }
+    // Повторный прогрев пока Главная подгружает обложки
+    setTimeout(prewarmExpressiveCards, 900);
+    setTimeout(prewarmExpressiveCards, 2000);
+    setTimeout(prewarmExpressiveCards, 3800);
+    const warmWait = setInterval(() => {
+        if (document.querySelector(".view-homeShortcutsGrid-shortcut img")) {
+            prewarmExpressiveCards();
+            clearInterval(warmWait);
+        }
+    }, 600);
+    setTimeout(() => clearInterval(warmWait), 12000);
 
     document.addEventListener("pointerover", (e) => {
         if (document.documentElement.dataset.m3ePlus !== "1") return;
-        const card = e.target?.closest?.(".view-homeShortcutsGrid-shortcut, .main-card-card");
+        const card = e.target?.closest?.(".view-homeShortcutsGrid-shortcut, .main-card-card, [data-encore-id='card']");
         if (card) applyCardColor(card);
     }, { passive: true });
 
@@ -738,9 +771,22 @@
 
     function tryInjectSettings() {
         if (document.getElementById("m3e-settings-section")) return true;
-        const firstSec =
-            document.querySelector(".x-settings-section:has([data-settings-row])") ||
-            document.querySelector(".x-settings-row")?.closest(".x-settings-section");
+        let firstSec = null;
+        const firstH2 = document.querySelector('[data-testid="settings-page"] h2');
+        if (firstH2) {
+            let cur = firstH2.parentElement;
+            while (cur && cur.parentElement && cur.parentElement.tagName !== "MAIN" && cur.parentElement.children.length < 4) {
+                cur = cur.parentElement;
+            }
+            if (cur && cur.parentElement && cur.parentElement.children.length >= 2) {
+                firstSec = cur;
+            }
+        }
+        if (!firstSec) {
+            firstSec =
+                document.querySelector(".x-settings-section:has([data-settings-row])") ||
+                document.querySelector("[data-testid=\"settings-page\"] h2, .x-settings-row")?.closest(".x-settings-section");
+        }
         if (!firstSec || !firstSec.parentElement) return false;
 
         ensureCoreUiStyle();
@@ -936,6 +982,7 @@
     }
 
     let settingsTimer = null;
+    window.__m3eTryInjectSettings = tryInjectSettings;
     function scheduleSettingsInject() {
         if (settingsTimer) return;
         settingsTimer = setTimeout(() => {
@@ -948,7 +995,7 @@
     const obs = new MutationObserver(() => {
         const path = Spicetify.Platform?.History?.location?.pathname || "";
         if (path && path !== "/preferences") return;
-        if (!document.getElementById("m3e-settings-section") && document.querySelector(".x-settings-row")) {
+        if (!document.getElementById("m3e-settings-section") && document.querySelector("[data-testid=\"settings-page\"] h2, .x-settings-row")) {
             scheduleSettingsInject();
         }
     });
@@ -1134,4 +1181,261 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     if (window.Spicetify?.Player) {
         Spicetify.Player.addEventListener("songchange", () => setTimeout(recolorDj, 180));
     }
+})();
+
+// DOM class bridge for unmapped Spotify builds (Linux & future updates)
+(() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
+
+    const addCls = (el, cls) => {
+        if (el && !el.classList.contains(cls)) el.classList.add(cls);
+    };
+
+    const ensureBridgeStyle = () => {
+        if (document.getElementById("m3e-bridge-fallback")) return;
+        const st = document.createElement("style");
+        st.id = "m3e-bridge-fallback";
+        st.textContent = `
+            :where(#m3e-settings-section.x-settings-section) { display: grid; gap: 8px; }
+            :where(#m3e-settings-section .x-settings-headerContainer) { display: flex; align-items: center; }
+            :where(#m3e-settings-section .x-settings-row) { display: grid; grid-template-columns: 2fr 1fr; gap: 8px 24px; padding-block: 8px; align-items: center; }
+            :where(#m3e-settings-section .x-settings-firstColumn) { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+            :where(#m3e-settings-section .x-settings-secondColumn) { display: flex; justify-content: flex-end; align-items: center; position: relative; }
+            :where(#m3e-settings-section .x-toggle-wrapper) { display: inline-flex; align-items: center; position: relative; }
+            :where(#m3e-settings-section .x-toggle-input) { opacity: 0; pointer-events: none; position: absolute; }
+            :where(#m3e-settings-section .x-toggle-indicatorWrapper) { width: 42px; height: 24px; border-radius: 24px; position: relative; display: block; }
+            :where(#m3e-settings-section .x-toggle-indicator) { width: 20px; height: 20px; border-radius: 50%; position: absolute; top: 2px; left: 2px; display: block; }
+            :where(#m3e-settings-section input:checked ~ .x-toggle-indicatorWrapper .x-toggle-indicator) { left: auto; right: 2px; }
+        `;
+        document.head.appendChild(st);
+    };
+
+    const syncProgress = (scope) => {
+        if (!scope) return;
+        addCls(scope.querySelector('[data-testid="progress-bar"]'), "progress-bar");
+        const bg = scope.querySelector('[data-testid="progress-bar-background"]');
+        if (bg) {
+            addCls(bg, "x-progressBar-progressBarBg");
+            const areas = bg.querySelectorAll(".x-progressBar-sliderArea");
+            if (areas.length === 0) {
+                const divs = Array.from(bg.children).filter((c) => c.tagName === "DIV" && c.children.length > 0);
+                if (divs.length >= 2) {
+                    addCls(divs[0].firstElementChild, "x-progressBar-progressFillColor");
+                    addCls(divs[divs.length - 1].firstElementChild, "x-progressBar-fillColor");
+                } else if (divs.length === 1) {
+                    const ch = divs[0].children;
+                    if (ch.length >= 2) {
+                        addCls(ch[0], "x-progressBar-progressFillColor");
+                        addCls(ch[ch.length - 1], "x-progressBar-fillColor");
+                    } else if (ch.length === 1) {
+                        addCls(ch[0], "x-progressBar-fillColor");
+                    }
+                }
+            }
+        }
+        addCls(scope.querySelector('[data-testid="progress-bar-handle"]'), "progress-bar__slider");
+    };
+
+    const syncAll = () => {
+        ensureBridgeStyle();
+
+        const aside = document.querySelector('[data-testid="now-playing-bar"]');
+        if (aside) {
+            addCls(aside, "main-nowPlayingBar-container");
+            const npbSlot = aside.parentElement;
+            addCls(npbSlot, "Root__now-playing-bar");
+            const top = npbSlot?.parentElement;
+            if (top) {
+                addCls(top, "Root__top-container");
+                for (const ch of top.children) {
+                    if (ch === npbSlot) continue;
+                    if (ch.querySelector('main, [role="main"], [data-testid="home-page"], [data-testid="settings-page"]')) {
+                        addCls(ch, "Root__main-view");
+                        ch.classList.remove("Root__globalNav");
+                    } else if (ch.querySelector('[data-testid="left-sidebar-footer"], #Desktop_LeftSidebar_Id')) {
+                        addCls(ch, "Root__nav-bar");
+                    } else if (ch.querySelector('#Desktop_PanelContainer_Id, [data-testid="NPV_Panel_OpenDiv"], aside:not([data-testid="now-playing-bar"])')) {
+                        addCls(ch, "Root__right-sidebar");
+                    } else if (ch.querySelector('[data-testid="global-nav-bar"], [data-testid="user-widget-link"], [aria-label*="Marketplace" i]')) {
+                        addCls(ch, "Root__globalNav");
+                    }
+                }
+            }
+        }
+
+        const controls = document.querySelector('[data-testid="player-controls"]');
+        if (controls) {
+            const center = controls.parentElement;
+            addCls(center, "main-nowPlayingBar-center");
+            const inner = center?.parentElement;
+            if (inner) {
+                addCls(inner, "main-nowPlayingBar-nowPlayingBar");
+                if (inner.firstElementChild && inner.firstElementChild !== center) addCls(inner.firstElementChild, "main-nowPlayingBar-left");
+                if (inner.lastElementChild && inner.lastElementChild !== center) addCls(inner.lastElementChild, "main-nowPlayingBar-right");
+            }
+        }
+
+        const pbWrap = document.querySelector('[data-testid="playback-progressbar"]');
+        if (pbWrap) {
+            addCls(pbWrap, "playback-progressbar");
+            let p = pbWrap.parentElement;
+            for (let i = 0; i < 4 && p; i++, p = p.parentElement) {
+                if (p.querySelector('[data-testid="playback-position"]') || p.querySelector('[data-testid="playback-duration"]')) {
+                    addCls(p, "playback-bar");
+                    break;
+                }
+            }
+            syncProgress(pbWrap);
+        }
+
+        const vol = document.querySelector('[data-testid="volume-bar"]');
+        if (vol) {
+            addCls(vol, "main-nowPlayingBar-volumeBar");
+            syncProgress(vol);
+        }
+
+        const mainView = document.querySelector(".Root__main-view");
+        if (mainView) {
+            for (const d of mainView.querySelectorAll('div[style*="background-color"]')) {
+                if (d.classList.contains("main-home-homeHeader")) continue;
+                const cs = getComputedStyle(d);
+                if (cs.position === "absolute" && cs.backgroundImage && cs.backgroundImage.includes("linear-gradient")) {
+                    const rect = d.getBoundingClientRect();
+                    if (rect.height >= 120 && rect.height <= 460 && rect.width > 300) {
+                        addCls(d, "main-home-homeHeader");
+                    }
+                }
+            }
+
+            const homeChip = mainView.querySelector('button[role="checkbox"], [data-encore-id="chip"]');
+            if (homeChip) {
+                let cur = homeChip.parentElement;
+                while (cur && cur !== mainView) {
+                    const pos = getComputedStyle(cur).position;
+                    if (pos === "sticky" || pos === "fixed") {
+                        addCls(cur, "main-home-filterChipsContainer");
+                        const backdrop = cur.firstElementChild;
+                        if (backdrop && getComputedStyle(backdrop).position === "absolute") {
+                            addCls(backdrop, "main-home-filterChipsSection");
+                        }
+                        break;
+                    }
+                    cur = cur.parentElement;
+                }
+            }
+        }
+
+        const navBar = document.querySelector(".Root__nav-bar");
+        if (navBar) {
+            for (const item of navBar.querySelectorAll('[role="listitem"]')) {
+                addCls(item, "main-yourLibraryX-listItem");
+                const isArtist =
+                    !!item.querySelector('[class*="circular" i], [class*="circle" i]') ||
+                    !!item.querySelector('[aria-labelledby*="spotify:artist:"], [id*="spotify:artist:"]') ||
+                    (!!item.querySelector('[aria-labelledby*="spotify:user:"], [id*="spotify:user:"]') &&
+                     !item.querySelector('[aria-labelledby*=":playlist:"], [aria-labelledby*=":collection"], [id*=":playlist:"], [id*=":collection"]'));
+                if (isArtist) addCls(item, "m3e-circle-art");
+            }
+        }
+
+        const rightBar = document.querySelector(".Root__right-sidebar");
+        if (rightBar) {
+            for (const sec of rightBar.querySelectorAll(".main-nowPlayingView-section")) {
+                if (sec.querySelector('[data-testid*="lyrics" i], [class*="lyrics" i]')) {
+                    addCls(sec, "m3e-lyrics-card");
+                }
+            }
+        }
+
+        const settingsPage = document.querySelector('[data-testid="settings-page"]');
+        if (settingsPage) {
+            if (!document.getElementById("m3e-settings-section")) window.__m3eTryInjectSettings?.();
+            for (const h2 of settingsPage.querySelectorAll("h2")) {
+                if (h2.closest("#m3e-settings-section")) continue;
+                const sec = h2.parentElement;
+                if (sec && sec.parentElement && sec.parentElement.children.length >= 4) {
+                    addCls(sec, "x-settings-section");
+                }
+            }
+            for (const inp of settingsPage.querySelectorAll('input[type="checkbox"]')) {
+                if (inp.closest("#m3e-settings-section")) continue;
+                addCls(inp, "x-toggle-input");
+                const lbl = inp.closest("label");
+                if (lbl) {
+                    addCls(lbl, "x-toggle-wrapper");
+                    const indWrap = inp.nextElementSibling;
+                    if (indWrap) {
+                        addCls(indWrap, "x-toggle-indicatorWrapper");
+                        addCls(indWrap.firstElementChild, "x-toggle-indicator");
+                    }
+                    const col2 = lbl.parentElement;
+                    addCls(col2, "x-settings-secondColumn");
+                    addCls(col2?.previousElementSibling, "x-settings-firstColumn");
+                    const row = col2?.parentElement;
+                    if (row) {
+                        addCls(row, "x-settings-row");
+                        if (!row.hasAttribute("data-settings-row")) row.setAttribute("data-settings-row", "true");
+                    }
+                }
+            }
+            for (const sel of settingsPage.querySelectorAll("select")) {
+                if (sel.closest("#m3e-settings-section")) continue;
+                addCls(sel, "main-dropDown-dropDown");
+                const col2 = sel.parentElement;
+                addCls(col2, "x-settings-secondColumn");
+                addCls(col2?.previousElementSibling, "x-settings-firstColumn");
+                const row = col2?.parentElement;
+                if (row) {
+                    addCls(row, "x-settings-row");
+                    if (!row.hasAttribute("data-settings-row")) row.setAttribute("data-settings-row", "true");
+                }
+            }
+        }
+
+        for (const c of document.querySelectorAll('[data-encore-id="card"]')) addCls(c, "main-card-card");
+        for (const img of document.querySelectorAll('[data-testid="card-image"]')) {
+            addCls(img, "main-cardImage-image");
+            const imgWrap = img.parentElement;
+            addCls(imgWrap, "main-cardImage-imageWrapper");
+            const imgContainer = imgWrap?.parentElement;
+            if (imgContainer) {
+                addCls(imgContainer, "main-card-imageContainer");
+                const playBtn = imgContainer.querySelector('[data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]');
+                if (playBtn) {
+                    const wrap = playBtn.tagName === "BUTTON" ? playBtn.parentElement : playBtn;
+                    addCls(wrap, "main-playButton-PlayButton");
+                    if (wrap?.parentElement && wrap.parentElement !== imgContainer) {
+                        addCls(wrap.parentElement, "main-card-PlayButtonContainer");
+                    }
+                }
+            }
+            const card = img.closest('[role="group"], [draggable="true"], [data-encore-id="card"]') || imgContainer?.parentElement?.parentElement;
+            if (card && !card.matches('[data-testid="shortcut-card"]')) {
+                addCls(card, "main-card-card");
+            }
+        }
+
+        for (const el of document.querySelectorAll('[data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]:not([data-testid="control-button-playpause"])')) {
+            addCls(el.tagName === "BUTTON" ? el.parentElement : el, "main-playButton-PlayButton");
+        }
+        for (const el of document.querySelectorAll('[data-testid="tracklist-row"]')) addCls(el, "main-trackList-trackListRow");
+        for (const el of document.querySelectorAll('[data-testid="shortcut-card"]')) addCls(el, "view-homeShortcutsGrid-shortcut");
+    };
+
+    let timer = null;
+    const schedule = () => {
+        if (timer) return;
+        timer = setTimeout(() => { timer = null; syncAll(); }, 100);
+    };
+
+    let bootTries = 0;
+    const boot = setInterval(() => {
+        syncAll();
+        const root = document.getElementById("main");
+        if ((root && document.querySelector('[data-testid="now-playing-bar"]')) || ++bootTries >= 25) {
+            clearInterval(boot);
+            new MutationObserver(schedule).observe(root || document.body, { childList: true, subtree: true });
+            window.dispatchEvent(new Event("resize"));
+        }
+    }, 200);
 })();

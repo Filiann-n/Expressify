@@ -30,6 +30,15 @@ if ! command -v spicetify >/dev/null 2>&1; then
 fi
 
 if ! command -v spicetify >/dev/null 2>&1; then
+  for candidate in "$HOME/.spicetify" "$HOME/.local/bin" "/usr/local/bin" "/opt/homebrew/bin" "/home/linuxbrew/.linuxbrew/bin"; do
+    if [[ -x "$candidate/spicetify" ]]; then
+      export PATH="$candidate:$PATH"
+      break
+    fi
+  done
+fi
+
+if ! command -v spicetify >/dev/null 2>&1; then
   echo "Spicetify is required to use this theme."
   echo "Install Spicetify first: https://spicetify.app"
   echo "Or if it's already installed, add it to your PATH:"
@@ -48,6 +57,7 @@ download_file() {
   fi
 }
 
+<<<<<<< HEAD
 # === 2. Надёжное определение папки Spicetify ===
 SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
 if [[ -z "$SPICETIFY_USER" ]]; then
@@ -57,6 +67,14 @@ if [[ -z "$SPICETIFY_USER" ]]; then
   else
     SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
   fi
+=======
+SPICETIFY_CFG="$(spicetify -c 2>/dev/null | head -n1 || true)"
+if [[ -n "$SPICETIFY_CFG" ]]; then
+  SPICETIFY_USER="$(dirname "$SPICETIFY_CFG")"
+else
+  SPICETIFY_USER="$(spicetify path userdata 2>/dev/null | head -n1 || true)"
+  [[ -z "$SPICETIFY_USER" ]] && SPICETIFY_USER="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
+>>>>>>> 5c231b2 (ohhhhmyy)
 fi
 
 TARGET_DIR="$SPICETIFY_USER/Themes/M3Expressive"
@@ -97,6 +115,7 @@ if [[ "$NO_WALLPAPER_SYNC" -eq 0 && -x "$TARGET_DIR/scripts/sync-wallpaper.sh" ]
   "$TARGET_DIR/scripts/sync-wallpaper.sh" || echo "Wallpaper sync skipped."
 fi
 
+<<<<<<< HEAD
 # === 3. Применение с подсказкой по правам на Linux при ошибке ===
 if [[ "$NO_APPLY" -eq 0 ]]; then
   if ! spicetify apply; then
@@ -106,8 +125,17 @@ if [[ "$NO_APPLY" -eq 0 ]]; then
     echo "  sudo chmod a+wr /opt/spotify"
     echo "  sudo chmod a+wr /opt/spotify/Apps -R"
     echo "После этого выполни: spicetify apply"
+=======
+if [[ "$NO_APPLY" -eq 0 ]]; then
+  if ! spicetify apply; then
+    echo "spicetify apply failed. On Linux you may need write permissions on Spotify's folder (e.g. chmod a+wr)." >&2
+>>>>>>> 5c231b2 (ohhhhmyy)
     exit 1
   fi
 fi
 
+<<<<<<< HEAD
 echo "M3 Expressive installed successfully."
+=======
+echo "M3 Expressive installed."
+>>>>>>> 5c231b2 (ohhhhmyy)

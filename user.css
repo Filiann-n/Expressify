@@ -498,7 +498,7 @@ button[data-encore-id="buttonSecondary"]:active {
   overflow: hidden !important;
 }
 
-.Root__right-sidebar .main-nowPlayingView-section:not(:has([data-testid*="lyrics" i], [class*="lyrics" i])) {
+.Root__right-sidebar .main-nowPlayingView-section:not(.m3e-lyrics-card) {
   background-color: var(--spice-m3-surface-container, #1f201f) !important;
   border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.35) !important;
   transition: background-color 0.45s ease !important;
@@ -702,7 +702,7 @@ input[type="range"]::-webkit-slider-thumb {
 [role="menu"] .yp9K_GG6MgsoxKPtPMPE:not([role="menu"]),
 [role="menu"] .main-contextMenu-menu:not([role="menu"]),
 :is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"]) > ul,
-:is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"]) > div:not(:has(> input)) {
+:is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"]) > div:not(:has(> input)):not([role="menuitem"]):not([role="menuitemradio"]):not([role="menuitemcheckbox"]):not([class*="-menu-row"]):not([data-encore-id]) {
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
@@ -871,7 +871,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .main-card-card {
-  border: 1px solid transparent !important;
+  border: none !important;
 }
 
 .main-card-imagePlaceholder {
@@ -1273,67 +1273,6 @@ button[data-encore-id="buttonSecondary"],
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.16s ease !important;
 }
 
-.Root__globalNav button:has(svg path[d^="M8 1a7 7 0 1 0 0 14"]) {
-  -webkit-app-region: no-drag !important;
-  app-region: no-drag !important;
-  pointer-events: auto !important;
-  position: relative !important;
-  z-index: 20 !important;
-  cursor: pointer !important;
-  width: auto !important;
-  min-width: max-content !important;
-  height: 38px !important;
-  min-height: 38px !important;
-  padding: 0 14px 0 11px !important;
-  gap: 7px !important;
-  border-radius: 14px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background-color: var(--spice-m3-primary-container, #394a46) !important;
-  color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
-  border: 1px solid rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.35) !important;
-  transition: border-radius 0.24s cubic-bezier(0.2, 0, 0, 1), transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease !important;
-}
-
-.Root__globalNav button:has(svg path[d^="M8 1a7 7 0 1 0 0 14"]) svg {
-  width: 18px !important;
-  height: 18px !important;
-  flex-shrink: 0 !important;
-  pointer-events: none !important;
-}
-
-.Root__globalNav button:has(svg path[d*="1.5 1.5 0 0 0"])::after {
-  content: "Impulse" !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  pointer-events: none !important;
-}
-
-.Root__globalNav button:has(svg path[d*="2.5 2.5 0 1 1"])::after {
-  content: "Track" !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  pointer-events: none !important;
-}
-
-.Root__globalNav button:has(svg path[d^="M8 1a7 7 0 1 0 0 14"]):hover {
-  background-color: var(--spice-m3-secondary-cont, #3f4946) !important;
-  color: var(--spice-m3-on-secondary-cont, #dae5e1) !important;
-  transform: scale(1.04) !important;
-}
-
-.Root__globalNav button:has(svg path[d^="M8 1a7 7 0 1 0 0 14"]):active {
-  border-radius: 10px !important;
-  transform: scale(0.95) !important;
-}
-
 body .Root__globalNav :is( [data-testid="whats-new-feed-button"], [data-testid="whats-new-feed-button"] + button, [data-testid="buddy-list-button"], [data-testid*="friend" i], [data-testid*="activity" i], button[aria-label*="What's New" i], button[aria-label*="What's New" i] + button, button[aria-label*="Новинк" i], button[aria-label*="Новинк" i] + button, button[aria-label*="Уведомлен" i], button[aria-label*="Friend" i], button[aria-label*="playing" i], button[aria-label*="activity" i], button[aria-label*="активност" i], button[aria-label*="Друз" i] ) {
   width: 36px !important;
   height: 36px !important;
@@ -1418,14 +1357,6 @@ body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidg
   border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.3) !important;
   overflow: hidden !important;
   transition: background-color 0.16s ease, border-color 0.16s ease !important;
-}
-
-.main-home-home [data-testid="grid-container"] > div:not(.main-card-card),
-[data-testid="home-page"] [data-testid="grid-container"] > div:not(.main-card-card) {
-  border-radius: 16px !important;
-  background-color: var(--spice-m3-surface-high, #292a2a) !important;
-  border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.3) !important;
-  overflow: hidden !important;
 }
 
 .view-homeShortcutsGrid-shortcut:hover,
@@ -1691,8 +1622,8 @@ html body [data-tippy-root]:not(:has([role="menu"])) {
 }
 
 html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) :is(.tippy-content, .tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small, .encore-inverted-light-set, .encore-dark-theme),
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) *::before,
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) *::after {
+html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])) > div::before,
+html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])) > div::after {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -1705,7 +1636,7 @@ html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])) .tip
   display: none !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) {
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) {
   background: none !important;
   background-color: var(--spice-m3-surface-highest, #343534) !important;
   color: var(--spice-m3-on-surface, #e3e2e1) !important;
@@ -1713,16 +1644,16 @@ html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encor
   overflow: hidden !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:has(svg, img, button)):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) {
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:has(svg, img, button)) {
   padding: 6px 12px !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"]):not(:has([role="menu"])):has(svg, img, button):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) {
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"]):not(:has([role="menu"])):has(svg, img, button) {
   padding: 8px 14px !important;
   border-radius: 14px !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"]):not(:has([role="menu"])):has(svg, img, button):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) > div,
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"]):not(:has([role="menu"])):has(svg, img, button) > div,
 html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])):has(svg, img, button) .tippy-content > div,
 html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])):has(svg, img, button) .main-contextMenu-tippy > div {
   background: transparent !important;
@@ -1924,7 +1855,7 @@ body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidg
   border-radius: 50% !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:has(svg, img, button)):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) {
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:has(svg, img, button)) {
   border-radius: 12px !important;
 }
 
@@ -1984,46 +1915,6 @@ button.main-playButton-PlayButton,
 
 .Root__main-view [data-testid="home-page"] {
   isolation: isolate !important;
-}
-
-.Root__main-view .main-home-homeHeader {
-  display: block !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
-  background-image: none !important;
-  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.28) !important;
-  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.12) 76%, transparent 100%) !important;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.12) 76%, transparent 100%) !important;
-  transition: background-color 0.55s ease !important;
-}
-
-.Root__main-view .main-home-filterChipsSection {
-  --background-base: var(--spice-m3-surface-container, #1f201f) !important;
-  background-color: color-mix(in srgb, var(--spice-m3-primary, #b8cac5) 14%, var(--spice-m3-surface-container, #1f201f)) !important;
-  background-image: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.25) !important;
-  transition: background-color 0.55s ease, opacity 0.35s ease-out !important;
-}
-
-.Root__main-view .main-home-filterChipsSection::after {
-  content: none !important;
-  display: none !important;
-  background: transparent !important;
-}
-
-.Root__main-view:has([data-testid="home-page"], .main-home-home) .under-main-view > div {
-  background: transparent !important;
-  background-image: none !important;
-}
-
-.Root__main-view:has([data-testid="home-page"], .main-home-home) .under-main-view {
-  background-color: transparent !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-  background-image: linear-gradient( 180deg, rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.28) 0%, rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.12) 48%, rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.03) 78%, rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0) 98% ) !important;
-  transition: background-image 0.55s ease !important;
 }
 
 body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box, button:has(img)) {
@@ -2179,7 +2070,7 @@ html body .x-toggle-wrapper input:checked:hover:not([disabled], :active) ~ .x-to
 
 .view-homeShortcutsGrid-shortcut,
 .x-settings-equalizerSection,
-.Root__right-sidebar .main-nowPlayingView-section:not(:has([data-testid*="lyrics" i], [class*="lyrics" i])),
+.Root__right-sidebar .main-nowPlayingView-section:not(.m3e-lyrics-card),
 .main-actionBar-ActionBar :is(.x-sortBox-sortDropdown, button[aria-label*="View" i], button[aria-label*="Sort" i], button[aria-label*="Вид" i], button[aria-label*="Сортир" i]),
 button[role="checkbox"][aria-checked]:not([aria-checked="true"]),
 button[role="radio"][aria-checked]:not([aria-checked="true"]),
@@ -2195,7 +2086,7 @@ button[data-encore-id="buttonSecondary"]:hover {
   box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.42) !important;
 }
 
-html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])):not(:is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small) *) {
+html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) {
   border: none !important;
   box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.32), 0 8px 24px rgba(0, 0, 0, 0.45) !important;
 }
@@ -2342,7 +2233,7 @@ html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encor
   display: none !important;
 }
 
-.eMkQVswe35l1UMepo4DZ[role="menuitemradio"][aria-checked="true"] {
+.eMkQVswe35l1UMepo4DZ[role="menuitemradio"][aria-checked="true"], [role="menu"] [role="menuitemradio"][aria-checked="true"] {
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 
@@ -2352,13 +2243,6 @@ html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encor
 
 .main-nowPlayingBar-right :is([fill="#1ed760" i], [fill="#1db954" i], [fill="#1fdf64" i]) {
   fill: var(--spice-m3-primary, #b8cac5) !important;
-}
-
-.main-actionBar-ActionBar .main-actionBar-exploreButton,
-.main-actionBar-ActionBar .main-actionBar-exploreButton * {
-  border-radius: 14px !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 
 .Root__nav-bar button[aria-label*="Create" i],
@@ -2414,7 +2298,7 @@ html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encor
   box-shadow: 0 0 0 2px var(--spice-m3-primary, #b8cac5) !important;
 }
 
-.Root__main-view:has(.u42Yq3ZaAiFZXbkvIpwy) {
+.u42Yq3ZaAiFZXbkvIpwy {
   --lyrics-color-background: var(--spice-m3-surface-container, #1f201f) !important;
   --lyrics-color-active: var(--spice-m3-on-surface, #e3e2e1) !important;
   --lyrics-color-inactive: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.36) !important;
@@ -2556,7 +2440,7 @@ html body .main-nowPlayingBar-center [data-testid="control-button-playpause"] sv
   position: relative;
   border-radius: 24px !important;
   transform: translate3d(0, 0, 0) !important;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0), inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant), 0.24) !important;
+  box-shadow: none !important;
   transition: transform 0.24s cubic-bezier(0.2, 0, 0, 1) !important;
   animation: none !important;
 }
@@ -2626,7 +2510,7 @@ html body .main-card-card:hover .main-cardImage-imageWrapper:has(> .main-cardIma
 }
 
 .main-card-card:hover .main-card-PlayButtonContainer,
-.main-card-card .main-card-PlayButtonContainer:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]) {
+.main-card-card .main-card-PlayButtonContainer.m3e-is-playing {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) scale(1) !important;
   pointer-events: auto !important;
@@ -2645,7 +2529,6 @@ html body .main-card-card:hover .main-cardImage-imageWrapper:has(> .main-cardIma
   background: transparent !important;
 }
 
-html body :is(.main-home-home, [data-testid="home-page"]) [data-testid="grid-container"]:has(.view-homeShortcutsGrid-shortcut),
 html body .view-homeShortcutsGrid-shortcuts {
   --item-height: 68px !important;
   grid-auto-rows: max-content !important;
@@ -2683,11 +2566,11 @@ html body .view-homeShortcutsGrid-shortcut:active {
   transform: scale(0.988) translateZ(0) !important;
 }
 
-html body .view-homeShortcutsGrid-shortcut:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]) {
+html body .view-homeShortcutsGrid-shortcut.m3e-is-playing {
   background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.16) !important;
 }
 
-html body .view-homeShortcutsGrid-shortcut:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])::after {
+html body .view-homeShortcutsGrid-shortcut.m3e-is-playing::after {
   box-shadow: inset 0 0 0 1.5px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.58) !important;
 }
 
@@ -2764,7 +2647,7 @@ html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonCon
 }
 
 html body .view-homeShortcutsGrid-shortcut:is(:hover, :focus-within) .view-homeShortcutsGrid-PlayButtonContainer,
-html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer:has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]) {
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer.m3e-is-playing {
   opacity: 1 !important;
   transform: translate3d(0, 0, 0) scale(1) !important;
   pointer-events: auto !important;
@@ -2798,25 +2681,25 @@ html body .main-nowPlayingBar-center [data-testid="control-button-playpause"]:no
   transition: opacity 0.2s ease !important;
 }
 
-html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, :focus-within, :has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])) {
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing) {
   background: linear-gradient( 90deg, rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.24) 0%, rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.11) 60%, rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.05) 100% ) !important;
 }
 
-html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, :focus-within, :has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"]))::after {
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing)::after {
   box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.62) !important;
 }
 
-html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, :focus-within, :has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])) :is(.view-homeShortcutsGrid-playButton, button.main-playButton-PlayButton, .main-playButton-PlayButton button) > span {
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing) :is(.view-homeShortcutsGrid-playButton, button.main-playButton-PlayButton, .main-playButton-PlayButton button) > span {
   background-color: var(--m3e-card-p, var(--spice-m3-primary)) !important;
   color: var(--m3e-card-on-p, var(--spice-m3-on-primary)) !important;
 }
 
-html[data-m3e-plus="1"] body .main-card-card:is(:hover, :focus-within, :has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])) {
+html[data-m3e-plus="1"] body .main-card-card:is(:hover, .m3e-is-playing) {
   background-color: rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.14) !important;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4), inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.56) !important;
 }
 
-html[data-m3e-plus="1"] body .main-card-card:is(:hover, :focus-within, :has([aria-label*="Pause" i], [aria-label*="Пауз" i], [aria-pressed="true"])) .main-card-PlayButtonContainer button > span {
+html[data-m3e-plus="1"] body .main-card-card:is(:hover, .m3e-is-playing) .main-card-PlayButtonContainer button > span {
   background-color: var(--m3e-card-p, var(--spice-m3-primary)) !important;
   color: var(--m3e-card-on-p, var(--spice-m3-on-primary)) !important;
 }
@@ -3103,12 +2986,13 @@ html body .main-nowPlayingBar-center [data-testid="playback-progressbar"] {
   z-index: 15 !important;
 }
 
-html body .Root__nav-bar :is( .x-entityImage-imageContainer:is([class*="circular" i], [class*="circle" i]), .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]), .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]) > div, .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]) img, .main-yourLibraryX-listItemArtwork:is([class*="circular" i], [class*="circle" i]), .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]), .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]) div:has(> img), .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]) img, div:has(> img:is([class*="circular" i], [class*="circle" i])), img:is([class*="circular" i], [class*="circle" i]), [role="listitem"]:has([aria-labelledby*="spotify:artist:"], [aria-labelledby*="spotify:user:"]:not([aria-labelledby*=":playlist:"]):not([aria-labelledby*=":collection"]), [id*="spotify:artist:"], [id*="spotify:user:"]:not([id*=":playlist:"]):not([id*=":collection"])) :is(.x-entityImage-imageContainer, .x-entityImage-imageContainer > div, .main-yourLibraryX-listItemArtwork, [data-testid="entity-image"], div:has(> img), img) ) {
+html body .Root__nav-bar .m3e-circle-art,
+html body .Root__nav-bar .m3e-circle-art :is(.x-entityImage-imageContainer, .x-entityImage-imageContainer > div, .main-yourLibraryX-listItemArtwork, .main-yourLibraryX-listItemArtwork > div, [data-testid="entity-image"], img) {
   border-radius: 50% !important;
   overflow: hidden !important;
 }
 
-html body .Root__nav-bar :is( .x-entityImage-imageContainer:is([class*="circular" i], [class*="circle" i], :has([class*="circular" i], [class*="circle" i])), .main-yourLibraryX-listItemArtwork:is([class*="circular" i], [class*="circle" i], :has([class*="circular" i], [class*="circle" i])), [role="listitem"]:has([aria-labelledby*="spotify:artist:"], [aria-labelledby*="spotify:user:"]:not([aria-labelledby*=":playlist:"]):not([aria-labelledby*=":collection"]), [id*="spotify:artist:"], [id*="spotify:user:"]:not([id*=":playlist:"]):not([id*=":collection"])) :is(.x-entityImage-imageContainer, .main-yourLibraryX-listItemArtwork, [data-testid="entity-image"]) ) {
+html body .Root__nav-bar .m3e-circle-art :is(.x-entityImage-imageContainer, .main-yourLibraryX-listItemArtwork, [data-testid="entity-image"]) {
   background: transparent !important;
   box-shadow: none !important;
   border: none !important;
@@ -3284,4 +3168,754 @@ html body .main-actionBar-ActionBar .main-actionBar-exploreButtonImageWrapper :i
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
+}
+
+/* Cross-version v1.3.10 + Linux polish */
+/* Keep right topbar buttons (What's New & Friend Activity) at 36x36 matching avatar */
+html body .Root__globalNav :is(
+  div:has(> [data-testid="user-widget-link"]) button:not([data-testid="user-widget-link"]):not(:has(img)),
+  [data-testid="whats-new-feed-button"],
+  [data-testid="buddy-list-button"],
+  button[aria-label*="What's New" i],
+  button[aria-label*="Friend" i],
+  button[aria-label*="Social" i],
+  button[aria-label*="Activity" i]
+) {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+/* Marketplace button: keep native size from GITHUB HEAD, ensure M3 surface & 12px squircle */
+html body .Root__globalNav button:is([aria-label*="Marketplace" i], [title*="Marketplace" i]) {
+  border-radius: 12px !important;
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  color: var(--spice-m3-on-surface-var, #c7c6c5) !important;
+}
+
+/* Profile / Context Menu v2 (e-*-menu) */
+html body :is(.ZNdHcrLKbf8H6SBKh71v, [class*="-menu"][role="menu"]) {
+  --context-menu-leading-slot-display: none !important;
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  border-radius: 20px !important;
+  padding: 8px !important;
+}
+
+html body :is(.ZNdHcrLKbf8H6SBKh71v, [class*="-menu"][role="menu"])::before,
+html body :is(.ZNdHcrLKbf8H6SBKh71v, [class*="-menu"][role="menu"])::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body [role="menu"] :is([role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]):not(:has(> div > svg + span)):not(:has(p)) {
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  --encore-list-row-border-radius: 12px !important;
+  --encore-list-row-hover-bg: var(--spice-m3-secondary-cont, #3f4946) !important;
+  --list-row-hover-bg: var(--spice-m3-secondary-cont, #3f4946) !important;
+}
+
+html body [role="menu"] [data-encore-id="menuSectionHeader"] {
+  padding: 6px 12px 0 !important;
+}
+
+html body [role="menu"] [data-encore-id="menuSection"] [role="menuitem"]:has(> div:only-child > svg) {
+  block-size: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+html body [role="menu"] [data-encore-id="menuSection"] [role="menuitem"]:has(> div:only-child > svg) > div {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 6px !important;
+  padding: 6px 8px 10px !important;
+}
+
+html body [role="menu"] [data-encore-id="menuSection"] [role="menuitem"]:has(> div:only-child > svg) svg {
+  width: 24px !important;
+  height: 24px !important;
+  opacity: 1 !important;
+  display: block !important;
+  color: var(--spice-m3-primary, #b8cac5) !important;
+}
+
+/* Home surface, no top green hover bar, clean chips backdrop & Recents */
+html:not([data-m3e-disabled="1"]) body .Root__main-view {
+  isolation: isolate !important;
+  background-color: var(--spice-m3-surface-container, #1f201f) !important;
+}
+
+html body .Root__main-view .main-home-homeHeader {
+  display: none !important;
+}
+
+html body .Root__main-view .main-home-filterChipsSection,
+html body .Root__main-view [class*="filterChipsSection"] {
+  --background-base: var(--spice-m3-surface-container, #1f201f) !important;
+  background-color: var(--spice-m3-surface-container, #1f201f) !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 58%, rgba(0, 0, 0, 0) 100%) !important;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.92) 58%, rgba(0, 0, 0, 0) 100%) !important;
+  transition: background-color 0.45s ease, opacity 0.28s ease-out !important;
+}
+
+html body .Root__main-view .main-home-filterChipsSection::after,
+html body .Root__main-view [class*="filterChipsSection"]::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+html body [data-entity-row] {
+  border-radius: 14px !important;
+}
+
+html body [data-entity-row] .RUQHBF2RBNtKx2FdkA5T,
+html body [data-entity-row] .GcJeEAB1OhGpYwdh6d89 {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html body [data-entity-row] .GcJeEAB1OhGpYwdh6d89 {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+/* Unclip carousel cards & smooth hover/zoom without flash */
+html body [data-carousel-gridlist-item],
+html body [data-carousel-item] {
+  overflow: visible !important;
+}
+
+html body .main-card-card {
+  transition:
+    transform 0.24s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.22s ease,
+    box-shadow 0.22s ease !important;
+}
+
+html body .main-card-card::after {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html body .main-card-card:hover {
+  transform: translate3d(0, -2px, 0) !important;
+}
+
+html[data-m3e-plus="1"] body .main-card-card:is(:hover, .m3e-is-playing) {
+  box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.56) !important;
+}
+
+html body .main-card-card .main-card-imageContainer:not(.main-cardImage-circular) {
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body .main-card-card .main-cardImage-imageWrapper:not(.main-cardImage-circular) {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  transition: none !important;
+}
+
+html body .main-card-card:hover .main-cardImage-imageWrapper:not(.main-cardImage-circular) {
+  border-radius: 14px !important;
+}
+
+html body .main-card-card .main-cardImage-imageWrapper:not(.main-cardImage-circular) :is(img, .main-cardImage-image) {
+  border-radius: 0 !important;
+  transform: scale(1) translateZ(0) !important;
+  transition: transform 0.26s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .main-card-card:hover .main-cardImage-imageWrapper:not(.main-cardImage-circular) :is(img, .main-cardImage-image) {
+  transform: scale(1.025) translateZ(0) !important;
+}
+
+/* Card Play button: clean fade/scale, no dark flash */
+html body :is(.main-card-card, [data-encore-id="card"]) .main-card-PlayButtonContainer {
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 6px, 0) scale(0.9) !important;
+  transition: opacity 0.14s ease, transform 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]):is(:hover, :has(:focus-visible)) .main-card-PlayButtonContainer,
+html body :is(.main-card-card, [data-encore-id="card"]) .main-card-PlayButtonContainer.m3e-is-playing,
+html body :is(.main-card-card, [data-encore-id="card"]) .main-card-PlayButtonContainerVisible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  transition: opacity 0.18s ease, transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]),
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):is(:hover, :active, :focus, :disabled, [aria-disabled="true"]) {
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]) > span,
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):is(:focus, :disabled, [aria-disabled="true"]) > span {
+  background-color: var(--m3e-card-p, var(--spice-m3-primary, #b8cac5)) !important;
+  color: var(--m3e-card-on-p, var(--spice-m3-on-primary, #233430)) !important;
+  border-radius: 14px !important;
+  opacity: 1 !important;
+  transition: border-radius 0.22s cubic-bezier(0.2, 0, 0, 1), transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.14s ease !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):is([aria-label*="Pause" i], [aria-label*="Пауз" i]) > span {
+  border-radius: 21px !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):hover > span {
+  background-color: var(--m3e-card-p, var(--spice-m3-primary, #b8cac5)) !important;
+  filter: brightness(1.1) !important;
+  transform: scale(1.07) !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):active > span {
+  background-color: var(--m3e-card-p, var(--spice-m3-primary, #b8cac5)) !important;
+  filter: brightness(0.94) !important;
+  border-radius: 10px !important;
+  transform: scale(0.93) !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]) > span > span {
+  background: transparent !important;
+}
+
+/* Smooth 60fps progress bar (1.02s linear) + unplayed track right of handle */
+html body .main-nowPlayingBar-center .playback-bar .x-progressBar-progressBarBg,
+html body [data-testid="playback-progressbar"] .x-progressBar-progressBarBg {
+  background: transparent !important;
+}
+
+html body .main-nowPlayingBar-center .playback-bar .x-progressBar-progressBarBg::before,
+html body [data-testid="playback-progressbar"] .x-progressBar-progressBarBg::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 4px !important;
+  height: 3px !important;
+  left: calc(var(--progress-bar-transform, 0%) + 5px) !important;
+  right: 0 !important;
+  border-radius: 9999px !important;
+  background-color: rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.72) !important;
+  pointer-events: none !important;
+  transition: left 1.02s linear !important;
+}
+
+html body .main-nowPlayingBar-center .playback-bar .x-progressBar-fillColor {
+  transition: transform 1.02s linear !important;
+}
+
+html body .main-nowPlayingBar-center .playback-bar .progress-bar__slider,
+html body [data-testid="playback-progressbar"] [data-testid="progress-bar-handle"] {
+  transition: left 1.02s linear, height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease !important;
+}
+
+html body .main-nowPlayingBar-center .playback-bar:active .x-progressBar-fillColor,
+html body .main-nowPlayingBar-center .playback-bar:active .progress-bar__slider,
+html body .main-nowPlayingBar-center .playback-bar:active .x-progressBar-progressBarBg::before,
+html body .main-nowPlayingBar-center .playback-bar.m3-instant .x-progressBar-fillColor,
+html body .main-nowPlayingBar-center .playback-bar.m3-instant .progress-bar__slider,
+html body .main-nowPlayingBar-center .playback-bar.m3-instant .x-progressBar-progressBarBg::before {
+  transition: none !important;
+}
+
+/* Playlist track row hover: clean M3E tonal surface tint */
+html body .main-trackList-trackListRow {
+  border-radius: 14px !important;
+  transition: background-color 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+html body .main-trackList-trackListRow:hover {
+  background-color: color-mix(in srgb, var(--spice-m3-primary, #b8cac5) 14%, var(--spice-m3-surface-high, #292a2a)) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.22) !important;
+}
+
+html body .main-trackList-trackListRow:has(.encore-internal-color-text-bright-accent, .main-trackList-active),
+html body .main-trackList-trackListRow:has(.encore-internal-color-text-bright-accent, .main-trackList-active):hover {
+  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.20) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.38) !important;
+}
+
+/* Smooth shortcut cross-fade & elevated card Play contrast */
+html body .view-homeShortcutsGrid-shortcut {
+  border-radius: 16px !important;
+  border: none !important;
+  background-image: none !important;
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.30) !important;
+  overflow: hidden !important;
+  transition:
+    background-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut::before,
+html body .view-homeShortcutsGrid-shortcut::after {
+  content: none !important;
+  display: none !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:hover {
+  background-image: none !important;
+  background-color: var(--spice-m3-surface-highest, #343534) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.44) !important;
+}
+
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing) {
+  background-image: none !important;
+  background-color: color-mix(in srgb, rgb(var(--m3e-card-rgb, var(--spice-rgb-m3-primary))) 16%, var(--spice-m3-surface-high, #292a2a)) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.60) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-imageHolder,
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-imageContainer {
+  border-radius: 16px 0 0 16px !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer {
+  transform: scale(0.92) !important;
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:is(:hover, :focus-within) .view-homeShortcutsGrid-PlayButtonContainer,
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer.m3e-is-playing {
+  transform: scale(1) !important;
+}
+
+/* Elevated FAB shadow + dark rim so card Play never blends into bright yellow/white covers */
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]) > span,
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):hover > span,
+html body :is(.main-card-card, [data-encore-id="card"]) :is([data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]):active > span {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.50), 0 0 0 1.5px rgba(0, 0, 0, 0.24) !important;
+}
+
+/* Fast silky shortcut hover (no focus-within stickiness, no filter lag) */
+html body .view-homeShortcutsGrid-shortcut {
+  border-radius: 16px !important;
+  border: none !important;
+  background-image: none !important;
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.30) !important;
+  overflow: hidden !important;
+  transition:
+    background-color 0.16s ease,
+    box-shadow 0.16s ease !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:hover {
+  background-image: none !important;
+  background-color: var(--spice-m3-surface-highest, #343534) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.44) !important;
+}
+
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing) {
+  background-image: none !important;
+  background-color: color-mix(in srgb, rgb(var(--m3e-card-rgb, var(--spice-rgb-m3-primary))) 16%, var(--spice-m3-surface-high, #292a2a)) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.60) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut :is(.view-homeShortcutsGrid-image, img),
+html body .view-homeShortcutsGrid-shortcut:hover :is(.view-homeShortcutsGrid-image, img),
+html body .view-homeShortcutsGrid-shortcut:focus-within :is(.view-homeShortcutsGrid-image, img) {
+  filter: none !important;
+  transform: scale(1) translateZ(0) !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:hover :is(.view-homeShortcutsGrid-image, img) {
+  transform: scale(1.03) translateZ(0) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.9) !important;
+  transition: opacity 0.12s ease, transform 0.16s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-PlayButtonContainer,
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer.m3e-is-playing {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+  transition: opacity 0.14s ease, transform 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+/* Paint/style containment for instant 144fps card & shortcut hover */
+html body .view-homeShortcutsGrid-shortcut,
+html body .main-card-card,
+html body [data-encore-id="card"] {
+  contain: layout style !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut.m3e-is-playing .view-homeShortcutsGrid-PlayButtonContainer,
+html body .view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-PlayButtonContainer {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]).m3e-is-playing .main-card-PlayButtonContainer,
+html body :is(.main-card-card, [data-encore-id="card"]):hover .main-card-PlayButtonContainer {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+/* Unified synchronized hover choreography (shortcuts & cards) */
+html body .view-homeShortcutsGrid-shortcut {
+  transition:
+    background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-trailingOverlay {
+  transition: none !important;
+  transition-delay: 0s !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut :is(.view-homeShortcutsGrid-image, img),
+html body .view-homeShortcutsGrid-shortcut:hover :is(.view-homeShortcutsGrid-image, img) {
+  transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-PlayButtonContainer,
+html body .view-homeShortcutsGrid-shortcut:hover .view-homeShortcutsGrid-PlayButtonContainer,
+html body .view-homeShortcutsGrid-shortcut.m3e-is-playing .view-homeShortcutsGrid-PlayButtonContainer {
+  transition:
+    opacity 0.18s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut :is(.view-homeShortcutsGrid-playButton, button.main-playButton-PlayButton, .main-playButton-PlayButton button) > span {
+  transition:
+    border-radius 0.18s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .main-card-card,
+html body [data-encore-id="card"] {
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.22s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.22s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body .main-card-card .main-cardImage-imageWrapper:not(.main-cardImage-circular) :is(img, .main-cardImage-image),
+html body .main-card-card:hover .main-cardImage-imageWrapper:not(.main-cardImage-circular) :is(img, .main-cardImage-image) {
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+html body :is(.main-card-card, [data-encore-id="card"]) .main-card-PlayButtonContainer,
+html body :is(.main-card-card, [data-encore-id="card"]):hover .main-card-PlayButtonContainer,
+html body :is(.main-card-card, [data-encore-id="card"]).m3e-is-playing .main-card-PlayButtonContainer {
+  transition:
+    opacity 0.22s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.22s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition-delay: 0s !important;
+}
+
+/* Concentric exploreButton frame & zero-twitch profile menu */
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton {
+  position: relative !important;
+  box-sizing: border-box !important;
+  width: 38px !important;
+  height: 48px !important;
+  min-width: 38px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  border: 2px solid rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.68) !important;
+  background: var(--spice-m3-surface-high, #292a2a) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: hidden !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease !important;
+}
+
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton:hover {
+  border-color: var(--spice-m3-primary, #b8cac5) !important;
+  transform: scale(1.06) !important;
+}
+
+/* Remove Spotify's duplicate native border layer inside exploreButton */
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton::before,
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton::after,
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton > div:empty,
+html body .main-actionBar-ActionBar .main-actionBar-exploreButton > svg {
+  content: none !important;
+  display: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html body .main-actionBar-ActionBar .main-actionBar-exploreButtonImageWrapper {
+  position: absolute !important;
+  inset: 2px !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+html body .main-actionBar-ActionBar .main-actionBar-exploreButtonImageWrapper :is(img, video, div) {
+  border-radius: 8px !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Concentric 20px hover container around 14px artwork in left sidebar */
+html body .Root__nav-bar .main-yourLibraryX-listItem,
+html body .Root__nav-bar .main-yourLibraryX-listItem > div,
+html body .Root__nav-bar [role="listitem"],
+html body .Root__nav-bar [role="row"] > div,
+html body .Root__nav-bar [data-testid="rootlist-item"] {
+  border-radius: 20px !important;
+}
+
+/* Hide Upgrade/Support on frame 0 in v1.3.10+ menu so it never jumps after opening */
+html body [role="menu"] :is(a, button, div)[role="menuitem"]:is(
+  [href*="support.spotify" i],
+  [href*="upgrade" i],
+  [href*="premium" i]
+) {
+  display: none !important;
+}
+
+/* Sidebar Option A (rail pill, single-layer 20px hover) & zero-shift profile menu */
+html body .Root__nav-bar .main-yourLibraryX-listItem {
+  border-radius: 20px !important;
+  transition: background-color 0.16s ease !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem:hover {
+  background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.08) !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"] {
+  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.14) !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"]:hover {
+  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.20) !important;
+}
+
+/* Strip duplicate inner listRow hover/active layer inside left sidebar */
+html body .Root__nav-bar [data-encore-id="listRow"],
+html body .Root__nav-bar [data-encore-id="listRow"]:hover,
+html body .Root__nav-bar [data-encore-id="listRow"]:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  --encore-list-row-bg: transparent !important;
+  --encore-list-row-hover-bg: transparent !important;
+  --encore-list-row-active-bg: transparent !important;
+  --list-row-hover-bg: transparent !important;
+  --list-row-active-bg: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 20px !important;
+}
+
+html body .Root__nav-bar [data-encore-id="listRow"]::before,
+html body .Root__nav-bar [data-encore-id="listRow"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Option A: remove heavy 2px cover ring so the left rail pill has clean breathing room */
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"] :is(.x-entityImage-imageContainer, [data-testid="entity-image"], .main-yourLibraryX-listItemArtwork) {
+  box-shadow: none !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"]::before {
+  left: 1px !important;
+  width: 3.5px !important;
+}
+
+/* Lock profile menu width from T0 so async "Your Updates" never shifts horizontally */
+html body [role="menu"]:has([data-encore-id="menuSection"]) {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+}
+
+html body [role="menu"] [data-encore-id="menuSection"] {
+  min-height: 118px !important;
+}
+
+/* Clean idle cards (no clip/crowding) & transparent selected sidebar item */
+/* 1. Left sidebar: selected item shows only the clean left pill; 20px surface appears only on hover */
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"] {
+  background-color: transparent !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem:hover {
+  background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.08) !important;
+}
+
+html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"]:hover {
+  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.14) !important;
+}
+
+/* 2. Cards: transparent at rest so they never crowd together; no upward translate so top border never clips */
+html body .main-card-card,
+html body [data-encore-id="card"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html body .main-card-card:hover,
+html body [data-encore-id="card"]:hover {
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.42) !important;
+  transform: none !important;
+}
+
+html[data-m3e-plus="1"] body :is(.main-card-card, [data-encore-id="card"]):is(:hover, .m3e-is-playing) {
+  background-color: rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.14) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.56) !important;
+  transform: none !important;
+}
+
+/* Keep card height cleanly inside carousel viewport */
+html body .main-card-card,
+html body [data-encore-id="card"] {
+  padding: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Kill sidebar white focus ring & anchor-scale menu jump */
+html body .Root__nav-bar :is(.main-yourLibraryX-listItem, [data-encore-id="listRow"], [role="listitem"], [role="row"]):is(:focus, :focus-visible),
+html body .Root__nav-bar :is(.main-yourLibraryX-listItem, [data-encore-id="listRow"]) :is(button, a, div):is(:focus, :focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Keep Avatar button anchor geometry static so profile menu never shifts +2px on click */
+html body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box),
+html body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box):is(:hover, :active, :focus, :focus-visible) {
+  transform: none !important;
+  outline: none !important;
+}
+
+html body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box) > :is(figure, div, span) {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+html body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box):hover > :is(figure, div, span) {
+  transform: scale(1.06) !important;
+}
+
+html body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidget-box):active > :is(figure, div, span) {
+  transform: scale(0.94) !important;
+}
+
+/* Large Home discovery/canvas cards: 16px clean corners */
+html body [data-testid="home-page"] section [data-encore-id="box"],
+html body .TGunFtGt2dbW0SdDfF4T > [data-encore-id="box"] {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Remove colored background on .ldBWjYnPiKDAyMuwLD4A so zero fringe bleeds at 16px corners */
+html body .ldBWjYnPiKDAyMuwLD4A,
+html body [data-testid="home-page"] section [data-encore-id="box"] .search-searchCategory-contentArea {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+}
+
+html body [data-testid="home-page"] section [data-encore-id="box"] .j2NrQiapl9sqkZsRbWwJ > img,
+html body [data-testid="home-page"] section [data-encore-id="box"] .search-searchCategory-contentArea :is(img, video) {
+  border-radius: 0 !important;
+}
+
+/* Compact footer gap between description text and Preview / Play buttons */
+html body [data-testid="home-page"] section [data-encore-id="box"] footer,
+html body .TGunFtGt2dbW0SdDfF4T footer,
+html body .qdgO7Lb96DyCWb7tJduP {
+  height: auto !important;
+  min-height: 0 !important;
+  justify-content: flex-end !important;
+}
+
+html body [data-testid="home-page"] section [data-encore-id="box"] footer > div:first-child,
+html body .TGunFtGt2dbW0SdDfF4T footer > div:first-child,
+html body .qdgO7Lb96DyCWb7tJduP > .czirGVRVtnZWGWPpbILj {
+  height: auto !important;
+  min-height: 0 !important;
+  margin-bottom: 12px !important;
+}
+
+/* Restore left & right sidebar drag-to-resize handles */
+html body .Root__nav-bar,
+html body .Root__right-sidebar {
+  overflow: visible !important;
+}
+
+html body .Root__nav-bar > :not(.LayoutResizer__resize-bar),
+html body .Root__right-sidebar > :not(.LayoutResizer__resize-bar) {
+  border-radius: 23px !important;
+  overflow: hidden !important;
+}
+
+html body .LayoutResizer__resize-bar {
+  z-index: 20 !important;
+}
+
+html body .LayoutResizer__resize-bar:focus-within {
+  outline: none !important;
+}
+
+html body .LayoutResizer__inline-start::after,
+html body .LayoutResizer__inline-end::after {
+  width: 2px !important;
+  height: calc(100% - 36px) !important;
+  border-radius: 9999px !important;
+  background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.55) !important;
+}
+
+html body .LayoutResizer__resize-bar--resizing.LayoutResizer__inline-start::after,
+html body .LayoutResizer__resize-bar--resizing.LayoutResizer__inline-end::after {
+  background-color: var(--spice-m3-primary, #b8cac5) !important;
 }
