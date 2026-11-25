@@ -71,7 +71,7 @@
         "--spice-m3-tertiary", "--spice-m3-outline", "--spice-m3-outline-variant",
         "--spice-m3-on-surface", "--spice-m3-on-surface-var",
         "--spice-rgb-m3-primary", "--spice-rgb-m3-secondary-cont",
-        "--spice-rgb-m3-outline", "--spice-rgb-m3-outline-variant",
+        "--spice-rgb-m3-outline", "--spice-rgb-m3-outline-variant", "--spice-rgb-m3-on-surface",
         "--spice-button", "--spice-button-active", "--spice-text", "--spice-subtext",
         "--spice-main", "--spice-sidebar", "--spice-player", "--spice-card"
     ];
@@ -280,6 +280,7 @@
             "--spice-rgb-m3-secondary-cont": hslRgbStr(secH, Math.min(34, bgSat + 14), 27),
             "--spice-rgb-m3-outline": hslRgbStr(bgH, 8, 57),
             "--spice-rgb-m3-outline-variant": hslRgbStr(bgH, bgSat, 28),
+            "--spice-rgb-m3-on-surface": hslRgbStr(bgH, 12, 91),
 
             "--spice-button": pHex,
             "--spice-button-active": onPContHex,
@@ -1009,29 +1010,76 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
 /* M3E_DJ_RECOLOR_START */
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
-    const GREEN_RE = /rgb\(\s*(?:29,\s*185,\s*84|30,\s*215,\s*96|31,\s*223,\s*100|25,\s*230,\s*140|26,\s*188,\s*84)\s*\)|#(?:1db954|1ed760|1fdf64|19e68c|1abc54)/i;
+    const GREEN_RE = /rgba?\(\s*(?:29,\s*185,\s*84|30,\s*215,\s*96|31,\s*223,\s*100|25,\s*230,\s*140|26,\s*188,\s*84|59,\s*228,\s*119)(?:\s*,\s*[\d.]+)?\s*\)|#(?:1db954|1ed760|1fdf64|19e68c|1abc54|3be477)(?:[0-9a-f]{2})?/i;
+    const isTranslucent = (val, opacityAttr) => {
+        if (opacityAttr && parseFloat(opacityAttr) < 0.9) return true;
+        if (/rgba\(/i.test(val)) {
+            const m = val.match(/,\s*([\d.]+)\s*\)/);
+            if (m && parseFloat(m[1]) < 0.9) return true;
+        }
+        if (/^#[0-9a-f]{8}$/i.test(val.trim())) return true;
+        return false;
+    };
+
     const recolorDj = () => {
         const bar = document.querySelector(".main-nowPlayingBar-right");
         if (!bar) return;
-        for (const el of bar.querySelectorAll("button, button span, button svg, button path, button circle")) {
-            if (el.dataset?.m3eDj === "1" && el.tagName !== "BUTTON") continue;
+        for (const el of bar.querySelectorAll("button, button div, button span, button svg, button path, button circle, button ellipse, button rect")) {
+            const btn = el.tagName === "BUTTON" ? el : el.closest("button");
+            const isDjBtn = btn && (/dj/i.test(btn.getAttribute("aria-label") || "") || /dj/i.test(btn.getAttribute("data-testid") || ""));
+            if (isDjBtn) btn.classList.add("m3e-dj-btn");
+
             const aStroke = el.getAttribute?.("stroke") || "";
             const aFill   = el.getAttribute?.("fill") || "";
-            if (GREEN_RE.test(aStroke)) { el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important"); if (el.dataset) el.dataset.m3eDj = "1"; continue; }
-            if (GREEN_RE.test(aFill))   { el.style.setProperty("fill",   "var(--spice-m3-primary, #b8cac5)", "important"); if (el.dataset) el.dataset.m3eDj = "1"; continue; }
-            const cs = getComputedStyle(el);
+            const aFillOp = el.getAttribute?.("fill-opacity") || "";
             let hit = false;
-            if (GREEN_RE.test(cs.color))  { el.style.setProperty("color",  "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
-            if (GREEN_RE.test(cs.fill))   { el.style.setProperty("fill",   "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
-            if (GREEN_RE.test(cs.stroke)) { el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
-            if (hit && el.dataset) el.dataset.m3eDj = "1";
+
+            if (GREEN_RE.test(aStroke)) {
+                el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important");
+                hit = true;
+            }
+            if (GREEN_RE.test(aFill)) {
+                const fillVal = isTranslucent(aFill, aFillOp)
+                    ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)"
+                    : "var(--spice-m3-primary, #b8cac5)";
+                el.style.setProperty("fill", fillVal, "important");
+                hit = true;
+            }
+
+            const cs = getComputedStyle(el);
+            if (GREEN_RE.test(cs.color)) {
+                el.style.setProperty("color", "var(--spice-m3-primary, #b8cac5)", "important");
+                hit = true;
+            }
+            if (GREEN_RE.test(cs.fill)) {
+                const fillVal = isTranslucent(cs.fill, cs.fillOpacity)
+                    ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)"
+                    : "var(--spice-m3-primary, #b8cac5)";
+                el.style.setProperty("fill", fillVal, "important");
+                hit = true;
+            }
+            if (GREEN_RE.test(cs.stroke)) {
+                el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important");
+                hit = true;
+            }
+            if (GREEN_RE.test(cs.backgroundColor) || GREEN_RE.test(cs.backgroundImage)) {
+                if (el.tagName === "BUTTON") {
+                    el.style.setProperty("background-color", "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.20)", "important");
+                    el.style.setProperty("background-image", "none", "important");
+                } else {
+                    el.style.setProperty("background-color", "transparent", "important");
+                    el.style.setProperty("background-image", "none", "important");
+                }
+                hit = true;
+            }
+            if (hit && btn) btn.classList.add("m3e-dj-btn");
         }
     };
 
     let djTimer = null;
     const scheduleDj = () => {
         if (djTimer) return;
-        djTimer = setTimeout(() => { djTimer = null; recolorDj(); }, 250);
+        djTimer = setTimeout(() => { djTimer = null; recolorDj(); }, 120);
     };
 
     const waitBar = setInterval(() => {
@@ -1039,7 +1087,8 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         if (!bar) return;
         clearInterval(waitBar);
         recolorDj();
-        new MutationObserver(scheduleDj).observe(bar, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "aria-pressed", "aria-checked"] });
+        bar.addEventListener("pointerenter", scheduleDj, true);
+        new MutationObserver(scheduleDj).observe(bar, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "aria-pressed", "aria-checked"] });
     }, 400);
 
     if (window.Spicetify?.Player) {

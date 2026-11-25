@@ -101,7 +101,7 @@ button.main-playButton-PlayButton {
     color: var(--spice-m3-on-primary, #233430) !important;
     border-radius: 12px !important;
     transition:
-        border-radius 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.3s ease !important;
 }
@@ -111,7 +111,7 @@ button.main-playButton-PlayButton {
     color: var(--spice-m3-on-primary, #233430) !important;
     border-radius: 16px !important;
     transition:
-        border-radius 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.3s ease !important;
 }
@@ -349,7 +349,7 @@ button[aria-label*="Upgrade" i] {
     color: var(--spice-m3-on-secondary-cont, #dae5e1) !important;
     border-radius: 14px !important;
     transition:
-        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease !important;
 }
@@ -380,7 +380,7 @@ button[role="radio"][aria-checked],
     color: var(--spice-m3-on-surface-var, #c7c6c5) !important;
     border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.6) !important;
     transition:
-        border-radius 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease,
         color 0.2s ease !important;
@@ -560,7 +560,7 @@ button[data-encore-id="buttonSecondary"] {
     border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.7) !important;
     border-radius: 9999px !important;
     transition:
-        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease,
         border-color 0.2s ease !important;
@@ -680,7 +680,7 @@ button[data-encore-id="buttonSecondary"]:active {
 .Root__main-view [role="tablist"] [role="tab"],
 .Root__main-view [data-testid="artist-page"] [role="tab"] {
     border-radius: 12px !important;
-    transition: background-color 0.2s ease, border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition: background-color 0.2s ease, border-radius 0.24s cubic-bezier(0.2, 0, 0, 1) !important;
 }
 
 .Root__main-view [role="tablist"] [role="tab"][aria-selected="true"] {
@@ -1062,7 +1062,7 @@ input[type="range"]::-webkit-slider-thumb {
     border-radius: 12px !important;
     background-color: transparent !important;
     transition:
-        border-radius 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease,
         color 0.2s ease !important;
@@ -1096,7 +1096,7 @@ input[type="range"]::-webkit-slider-thumb {
     border-radius: 12px !important;
     background-color: transparent !important;
     transition:
-        border-radius 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease,
         color 0.2s ease !important;
@@ -1519,7 +1519,7 @@ button[data-encore-id="buttonSecondary"],
     color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
     border: 1px solid rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.35) !important;
     transition:
-        border-radius 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease !important;
 }
@@ -1593,7 +1593,7 @@ body .Root__globalNav :is(
     align-items: center !important;
     justify-content: center !important;
     transition:
-        border-radius 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.18s ease,
         color 0.18s ease !important;
@@ -1674,7 +1674,7 @@ body .Root__globalNav :is(button[data-testid="user-widget-link"], .main-userWidg
     align-items: center !important;
     justify-content: center !important;
     transition:
-        border-radius 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
         box-shadow 0.2s ease !important;
 }
@@ -1769,7 +1769,7 @@ hr.Qv9Y7sVKGXMiybqgaf9R {
     border-radius: 12px !important;
     background-color: var(--spice-m3-surface-high, #292a2a) !important;
     border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.5) !important;
-    transition: border-radius 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.16s ease !important;
+    transition: border-radius 0.24s cubic-bezier(0.2, 0, 0, 1), background-color 0.16s ease !important;
 }
 
 .U48pbymREy3Yv4iSRCur button[aria-checked="true"],
@@ -1868,7 +1868,7 @@ hr.Qv9Y7sVKGXMiybqgaf9R {
     background-color: var(--spice-m3-primary, #b8cac5) !important;
     color: var(--spice-m3-on-primary, #233430) !important;
     border-radius: 14px !important;
-    transition: border-radius 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition: border-radius 0.24s cubic-bezier(0.2, 0, 0, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .e6ssqE0uX8qNAFRRz8rV :is([data-testid="play-button"], .main-playButton-PlayButton button) svg {
@@ -2187,7 +2187,7 @@ html body :is(.tippy-box, .main-contextMenu-tippy):not(:has([role="menu"])):has(
     align-items: center !important;
     justify-content: center !important;
     transition:
-        border-radius 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease !important;
 }
@@ -2849,7 +2849,7 @@ html body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encor
     border-radius: 14px !important;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28) !important;
     transition:
-        border-radius 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease,
         color 0.2s ease !important;
@@ -3426,7 +3426,7 @@ html body .AN5Yp3_RQTWvmVLyQCKt .main-playButton-PlayButton button > span {
     align-items: center !important;
     justify-content: center !important;
     transition:
-        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease !important;
 }
@@ -3521,7 +3521,7 @@ html body .e6ssqE0uX8qNAFRRz8rV :is([data-testid="play-button"], .main-playButto
     line-height: 0 !important;
     box-shadow: none !important;
     transition:
-        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.2s ease !important;
 }
@@ -3585,7 +3585,7 @@ html body .main-nowPlayingBar-right button {
     align-items: center !important;
     justify-content: center !important;
     transition:
-        border-radius 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
         transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
         background-color 0.18s ease,
         box-shadow 0.18s ease,
@@ -3655,3 +3655,250 @@ html body .main-nowPlayingBar-right button > span {
     justify-content: center !important;
 }
 /* M3E_PLAYER_BUTTONS_V2_END */
+
+/* M3E_PLAYER_TIMETIP_AND_SIDEBAR_CIRCLE_FIX_START */
+/* 1. Таймер перемотки (1:15) всегда поверх кнопки Play/Pause */
+html body .main-nowPlayingBar-center .player-controls__buttons {
+    position: relative !important;
+    z-index: 0 !important;
+}
+
+html body .main-nowPlayingBar-center [data-testid="control-button-playpause"] {
+    z-index: auto !important;
+}
+
+html body .main-nowPlayingBar-center .playback-bar,
+html body .main-nowPlayingBar-center [data-testid="playback-progressbar"] {
+    position: relative !important;
+    z-index: 15 !important;
+}
+
+/* 2. Круглые аватары артистов/профилей в левом сайдбаре без квадратной подложки */
+html body .Root__nav-bar :is(
+    .x-entityImage-imageContainer:is([class*="circular" i], [class*="circle" i]),
+    .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]),
+    .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]) > div,
+    .x-entityImage-imageContainer:has([class*="circular" i], [class*="circle" i]) img,
+    .main-yourLibraryX-listItemArtwork:is([class*="circular" i], [class*="circle" i]),
+    .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]),
+    .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]) div:has(> img),
+    .main-yourLibraryX-listItemArtwork:has([class*="circular" i], [class*="circle" i]) img,
+    div:has(> img:is([class*="circular" i], [class*="circle" i])),
+    img:is([class*="circular" i], [class*="circle" i]),
+    [role="listitem"]:has([aria-labelledby*="spotify:artist:"], [aria-labelledby*="spotify:user:"]:not([aria-labelledby*=":playlist:"]):not([aria-labelledby*=":collection"]), [id*="spotify:artist:"], [id*="spotify:user:"]:not([id*=":playlist:"]):not([id*=":collection"])) :is(.x-entityImage-imageContainer, .x-entityImage-imageContainer > div, .main-yourLibraryX-listItemArtwork, [data-testid="entity-image"], div:has(> img), img)
+) {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+html body .Root__nav-bar :is(
+    .x-entityImage-imageContainer:is([class*="circular" i], [class*="circle" i], :has([class*="circular" i], [class*="circle" i])),
+    .main-yourLibraryX-listItemArtwork:is([class*="circular" i], [class*="circle" i], :has([class*="circular" i], [class*="circle" i])),
+    [role="listitem"]:has([aria-labelledby*="spotify:artist:"], [aria-labelledby*="spotify:user:"]:not([aria-labelledby*=":playlist:"]):not([aria-labelledby*=":collection"]), [id*="spotify:artist:"], [id*="spotify:user:"]:not([id*=":playlist:"]):not([id*=":collection"])) :is(.x-entityImage-imageContainer, .main-yourLibraryX-listItemArtwork, [data-testid="entity-image"])
+) {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+/* M3E_PLAYER_TIMETIP_AND_SIDEBAR_CIRCLE_FIX_END */
+
+/* M3E_EXPRESSIVE_POLISH_V5_START */
+/* 1. Кнопка DJ внизу справа: убираем зелёную внутреннюю подложку/гало и выравниваем под M3E */
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i]) :is(div, span) {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i])::before,
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i])::after,
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i]) :is(div, span)::before,
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i]) :is(div, span)::after {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+html body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i]):hover {
+    background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.34) !important;
+    color: var(--spice-m3-primary, #b8cac5) !important;
+}
+
+/* 2. Настоящий M3 Expressive Shape Morphing для чипов: пилюля (9999px) -> сквиркл (10px) при выборе */
+html body :is(
+    button[role="checkbox"][aria-checked],
+    button[role="radio"][aria-checked],
+    [data-encore-id="chip"]:not(:has(button)):not(button *)
+) {
+    border-radius: 20px !important;
+    background-color: var(--spice-m3-surface-high, #292a2a) !important;
+    color: var(--spice-m3-on-surface-var, #c7c6c5) !important;
+    border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.55) !important;
+    transition:
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease !important;
+}
+
+html body :is(
+    button[role="checkbox"][aria-checked]:hover,
+    button[role="radio"][aria-checked]:hover,
+    [data-encore-id="chip"]:not(:has(button)):not(button *):hover
+) {
+    background-color: var(--spice-m3-surface-highest, #343534) !important;
+    color: var(--spice-m3-on-surface, #e3e2e1) !important;
+    transform: scale(1.03) !important;
+}
+
+html body :is(
+    button[role="checkbox"][aria-checked="true"],
+    button[role="radio"][aria-checked="true"],
+    [data-encore-id="chip"][aria-checked="true"]:not(:has(button)):not(button *),
+    [data-encore-id="chip"][aria-pressed="true"]:not(:has(button)):not(button *)
+) {
+    border-radius: 10px !important;
+    background-color: var(--spice-m3-primary-container, #394a46) !important;
+    color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
+    border-color: transparent !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.36) !important;
+    font-weight: 600 !important;
+}
+
+html body :is(
+    button[role="checkbox"][aria-checked="true"]:hover,
+    button[role="radio"][aria-checked="true"]:hover,
+    [data-encore-id="chip"][aria-checked="true"]:not(:has(button)):not(button *):hover,
+    [data-encore-id="chip"][aria-pressed="true"]:not(:has(button)):not(button *):hover
+) {
+    background-color: var(--spice-m3-primary-container, #394a46) !important;
+    color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.55) !important;
+    filter: brightness(1.08) !important;
+}
+
+html body :is(
+    button[role="checkbox"][aria-checked]:active,
+    button[role="radio"][aria-checked]:active,
+    [data-encore-id="chip"]:not(:has(button)):not(button *):active
+) {
+    border-radius: 8px !important;
+    transform: scale(0.95) !important;
+}
+
+/* 3. Кнопки Show all как M3 Expressive Text Button */
+html body :is(
+    a.main-shelf-seeAll,
+    [data-testid="see-all-link"],
+    [data-testid="leavebehinds-see-all"],
+    section[data-testid="component-shelf"] a[href*="/section/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/recents"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/discography/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/related"]:not(h2 a):not(h1 a)
+) {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
+    margin-inline-end: -6px !important;
+    border-radius: 20px !important;
+    color: var(--spice-m3-on-surface-var, #c7c6c5) !important;
+    text-decoration: none !important;
+    transition:
+        border-radius 0.24s cubic-bezier(0.2, 0, 0, 1),
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background-color 0.18s ease,
+        color 0.18s ease !important;
+}
+
+html body :is(
+    a.main-shelf-seeAll,
+    [data-testid="see-all-link"],
+    [data-testid="leavebehinds-see-all"],
+    section[data-testid="component-shelf"] a[href*="/section/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/recents"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/discography/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/related"]:not(h2 a):not(h1 a)
+) :is(span, p) {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+html body :is(
+    a.main-shelf-seeAll,
+    [data-testid="see-all-link"],
+    [data-testid="leavebehinds-see-all"],
+    section[data-testid="component-shelf"] a[href*="/section/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/recents"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/discography/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/related"]:not(h2 a):not(h1 a)
+):hover {
+    background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.14) !important;
+    color: var(--spice-m3-primary, #b8cac5) !important;
+    text-decoration: none !important;
+    transform: scale(1.03) !important;
+}
+
+html body :is(
+    a.main-shelf-seeAll,
+    [data-testid="see-all-link"],
+    [data-testid="leavebehinds-see-all"],
+    section[data-testid="component-shelf"] a[href*="/section/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/recents"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/discography/"]:not(h2 a):not(h1 a),
+    section[data-testid="component-shelf"] a[href*="/related"]:not(h2 a):not(h1 a)
+):active {
+    border-radius: 10px !important;
+    background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.22) !important;
+    transform: scale(0.95) !important;
+}
+/* M3E_EXPRESSIVE_POLISH_V5_END */
+
+/* M3E_HOME_SUBCHIPS_FIX_START */
+/* Убираем наезд под-чипов (.kKTArCCAPNmsiSUf2pRY и legacy-chip--secondary с margin-inline-start: -32px/-48px) */
+html body .kKTArCCAPNmsiSUf2pRY {
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    left: auto !important;
+    inset-inline-start: auto !important;
+    transform: none !important;
+}
+
+html body .kTthuH4E5FtgVDlKHQx6,
+html body .ib8fnf28PETy7sPRGCYD,
+html body [class*="legacy-chip--secondary"],
+html body [class*="legacy-chip--secondary"]:not(:first-child),
+html body [class*="legacy-chip--secondary"]:not(:first-child):focus-visible {
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    z-index: auto !important;
+}
+
+html body [class*="legacy-chip__inner--secondary"],
+html body :focus-visible > [class*="legacy-chip__inner--secondary"] {
+    padding-inline-start: var(--encore-spacing-tighter, 12px) !important;
+    padding-inline-end: var(--encore-spacing-tighter, 12px) !important;
+}
+
+html body .Yt3NCcQ9MNQ6msx88cPe :is(
+    button[role="checkbox"],
+    button[role="radio"],
+    [data-encore-id="chip"]:not(:has(button)):not(button *)
+) {
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    padding-inline: 14px !important;
+}
+
+html body .Yt3NCcQ9MNQ6msx88cPe :is(
+    button[role="checkbox"],
+    button[role="radio"],
+    [data-encore-id="chip"]:not(:has(button)):not(button *)
+) span {
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+}
+/* M3E_HOME_SUBCHIPS_FIX_END */
