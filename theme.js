@@ -1062,18 +1062,23 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
 // Hide Premium upsell and Support links in profile menu
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
-    const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка)$/i;
+    const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка|Report|Пожаловаться)$/i;
     const cleanMenus = (root) => {
         if (!root || root.nodeType !== 1) return;
         const menus = root.matches?.('[role="menu"]')
             ? [root]
             : Array.from(root.querySelectorAll?.('[role="menu"]') || []);
         for (const menu of menus) {
-            for (const item of menu.querySelectorAll('[role="menuitem"], a, button')) {
+            for (const item of menu.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="link"], [class*="-menu-row"], a, button')) {
                 const txt = (item.textContent || "").replace(/\s+/g, " ").trim();
                 const href = item.getAttribute?.("href") || "";
-                if (HIDE_MENU_RE.test(txt) || /support\.spotify\.com|campaign=upgrade/i.test(href)) {
-                    const row = item.closest("li, .main-contextMenu-menuItem") || item;
+                const isDisabled =
+                    item.matches('[aria-disabled="true"], [data-disabled], [data-disabled="true"], :disabled, .QJhiFHy4PAK8GKZ6QM4g') ||
+                    item.hasAttribute("disabled") ||
+                    parseFloat(getComputedStyle(item).opacity) < 0.75;
+                const isDisabledDownload = isDisabled && /^(Download|Скачать)$/i.test(txt);
+                if (HIDE_MENU_RE.test(txt) || isDisabledDownload || /support\.spotify\.com|campaign=upgrade/i.test(href)) {
+                    const row = item.closest('li, .main-contextMenu-menuItem, [role="menuitem"], [role="link"], [class*="-menu-row"]') || item;
                     row.style.setProperty("display", "none", "important");
                 }
             }

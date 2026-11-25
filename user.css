@@ -3771,7 +3771,7 @@ html body .Root__nav-bar .main-yourLibraryX-listItem[aria-selected="true"]::befo
 }
 
 /* Lock profile menu width from T0 so async "Your Updates" never shifts horizontally */
-html body [role="menu"]:has([data-encore-id="menuSection"]) {
+html body [role="menu"]:not([data-encore-id="popover"] > [role="menu"]):not(.mtbEdxr7a5xkrPujQt24 > [role="menu"]):has([data-encore-id="menuSection"]) {
   width: 320px !important;
   min-width: 320px !important;
   max-width: 320px !important;
@@ -3918,4 +3918,157 @@ html body .LayoutResizer__inline-end::after {
 html body .LayoutResizer__resize-bar--resizing.LayoutResizer__inline-start::after,
 html body .LayoutResizer__resize-bar--resizing.LayoutResizer__inline-end::after {
   background-color: var(--spice-m3-primary, #b8cac5) !important;
+}
+
+/* Unified playlist header text, hide menu shortcuts & clean v2 submenus */
+/* 1. Playlist/album header: keep all descriptions & metadata in one consistent secondary tone */
+html body .main-entityHeader-headerText,
+html body .main-entityHeader-headerText :is(span, p, div, a, button) {
+  color: var(--spice-m3-on-surface-var, #c7c6c5) !important;
+}
+
+html body .main-entityHeader-headerText > :first-child,
+html body .main-entityHeader-headerText > :first-child :is(span, div),
+html body .main-entityHeader-headerText :is(h1, h1 *, [data-testid="entityTitle"], [data-testid="entityTitle"] *, [data-testid="creator-link"], a[href*="/user/"], a[href*="/artist/"]) {
+  color: var(--spice-m3-on-surface, #e3e2e1) !important;
+}
+
+/* 2. Hide keyboard shortcut hint letters (L, Q, P, S, R, Alt A) in context menus, keep arrows & icons */
+html body [role="menu"] :is([class*="-menu-shortcut"], kbd),
+html body [data-encore-id="popover"] :is([class*="-menu-shortcut"], kbd),
+html body [role="menu"] .d5LLahAHx7frSN6Twww7 > :not(svg):not(.PG0t8hFHXYFUSHEgp_kj):not(:has(svg)),
+html body [role="menu"] .aQulp55x1QYRy85RO_gf:not(svg):not(:has(svg)) {
+  display: none !important;
+}
+
+/* 3. Submenus (Sleep timer, Share, Add to playlist / folder): single 20px rounded card on outer popover */
+html body :is([data-encore-id="popover"]:has(> [role="menu"]), .mtbEdxr7a5xkrPujQt24) {
+  box-sizing: border-box !important;
+  background-color: var(--spice-m3-surface-high, #292a2a) !important;
+  border-radius: 20px !important;
+  padding: 8px !important;
+  border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.35) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.48) !important;
+  min-width: 230px !important;
+  max-inline-size: 320px !important;
+  overflow: hidden !important;
+}
+
+/* Strip duplicate card/border/width from inner [role="menu"] inside submenu popover */
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24) > [role="menu"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-y: auto !important;
+}
+
+/* Search field inside submenu popovers ("Find a playlist" / "Find a folder") */
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24) .V95zX4RlWCzG0wAZAKfD,
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24) [class*="-menu-search-field"] {
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+}
+
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24, [role="menu"]) .x-filterBox-filterInputContainer {
+  border-radius: 12px !important;
+}
+
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24, [role="menu"]) input.x-filterBox-filterInput {
+  border-radius: 12px !important;
+  background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.08) !important;
+  border: 1px solid rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.42) !important;
+  outline: none !important;
+  transition: background-color 0.16s ease, border-color 0.16s ease !important;
+}
+
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24, [role="menu"]) input.x-filterBox-filterInput:focus {
+  background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.12) !important;
+  border-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.65) !important;
+}
+
+html body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24) [data-encore-id="menuSection"] {
+  min-height: 0 !important;
+}
+
+/* Clean shortcut corner clipping & hide v2 disabled/Report menu items */
+/* 1. Single exact 16px clip on shortcut tile + continuous top border so scaled artwork never bleeds dots in corners */
+html body .view-homeShortcutsGrid-shortcut {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round 16px) !important;
+  box-shadow: none !important;
+  transform: translateZ(0) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-imageHolder,
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-imageContainer,
+html body .view-homeShortcutsGrid-shortcut .view-homeShortcutsGrid-imageWrapper,
+html body .view-homeShortcutsGrid-shortcut :is(.view-homeShortcutsGrid-image, img) {
+  border-radius: 0 !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-outline-variant, 70, 71, 70), 0.30) !important;
+  pointer-events: none !important;
+  z-index: 4 !important;
+  transition: box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body .view-homeShortcutsGrid-shortcut:hover::after {
+  box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.44) !important;
+}
+
+html[data-m3e-plus="1"] body .view-homeShortcutsGrid-shortcut:is(:hover, .m3e-is-playing)::after {
+  box-shadow: inset 0 0 0 1.5px rgba(var(--m3e-card-rgb, var(--spice-rgb-m3-primary)), 0.60) !important;
+}
+
+/* 2. Hide Report links in CSS (disabled Download & Report text handled safely in theme.js without touching Your Updates) */
+html body [role="menu"] :is(
+  [role="menuitem"],
+  [role="link"],
+  [class*="-menu-row"],
+  a
+)[href*="report" i] {
+  display: none !important;
+}
+
+/* 3. Stop React Aria [data-focused] from keeping menu items highlighted after mouse leaves */
+html body [role="menu"] :is(
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="link"],
+  [class*="-menu-row"]
+):is([data-focused], :focus):not(:hover):not([data-hovered="true"]):not([data-focus-visible="true"]):not(:focus-visible) {
+  background-color: transparent !important;
+  --encore-list-row-hover-bg: transparent !important;
+  --list-row-hover-bg: transparent !important;
+}
+
+html body [role="menu"] :is(
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="link"],
+  [class*="-menu-row"]
+):not([data-encore-id="menuSection"] *):is(:hover, [data-hovered="true"], [data-focus-visible="true"], :focus-visible) {
+  background-color: var(--spice-m3-secondary-cont, #3f4946) !important;
+  --encore-list-row-hover-bg: var(--spice-m3-secondary-cont, #3f4946) !important;
+  --list-row-hover-bg: var(--spice-m3-secondary-cont, #3f4946) !important;
+}
+
+html body [role="menu"] :is([role="separator"], [class*="-menu-divider"]) + :is([role="separator"], [class*="-menu-divider"]) {
+  display: none !important;
 }
