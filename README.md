@@ -1,55 +1,84 @@
-# M3 Expressive for Spicetify
+# Expressify
 
-A Material 3 Expressive theme for the Spotify desktop client, built for [Spicetify](https://spicetify.app).
+[Русский](README.ru.md)
 
-## Requirements
+Material 3 Expressive theme for desktop Spotify ([Spicetify](https://spicetify.app)).
 
-- Desktop Spotify client (standard installer / Scoop on Windows, or native package on Linux; Microsoft Store builds are not supported)
-- **[Spicetify](https://spicetify.app)** installed
+![Expressify](preview.png)
 
-> This repo only installs the theme itself. The install scripts check whether `spicetify` is present and will not install Spicetify for you.
+## What it does
 
-## Features
+- Rounded floating panels, wavy progress bar, morphing Play/Pause and chips, compact What's New cards.
+- **Settings inside Spotify (`Ctrl + P`):**
+  - Turn the theme on/off without touching your Spicetify config.
+  - **Dynamic track colors** — pulls colors from the currently playing track (4 styles: Balanced, Contrast, Vibrant, Cover match).
+  - **Expressive+** — tints Home tiles and cards using their own cover art.
+  - **UI outlines** — toggle borders around cards, panels, menus, and buttons.
+  - Switches between English and Russian automatically based on your Spotify language.
+- **Desktop wallpaper sync** (manual install only) — grabs colors from your Windows or Linux wallpaper when dynamic track colors are turned off.
 
-- Floating rounded panels, wavy playback progress bar, and shape-morphing controls (Play/Pause, filter chips, active player buttons)
-- Dynamic dark palette extracted from the current track cover (`Balanced`, `Contrast`, `Vibrant`, `Cover match`)
-- `Expressive+` adaptive artwork accents on Home tiles and cards
-- Optional system wallpaper sync for static mode (Windows and Linux)
-- Built-in `M3 Expressive` section inside Spotify Settings (auto RU/EN) with a toggle to disable the theme and reload back to vanilla Spotify
+## Install
 
-## Installation
+You need desktop Spotify (not the Microsoft Store version) and **Spicetify** already installed.
 
-### Windows (PowerShell)
+### Spicetify Marketplace (easiest)
 
-```powershell
+1. Open **Marketplace -> Themes** inside Spotify.
+2. Search for **Expressify**.
+3. Click **Install** and reload Spotify.
+
+Everything works out of the box here except desktop wallpaper sync (Spotify doesn't let Marketplace themes run OS scripts).
+
+### Manual install (includes wallpaper sync)
+
+**Windows (PowerShell):**
+~~~powershell
 irm https://raw.githubusercontent.com/Filiann-n/Expressify/main/install.ps1 | iex
-```
+~~~
 
-### Linux (Bash)
-
-```bash
+**Linux (Bash):**
+~~~bash
 curl -fsSL https://raw.githubusercontent.com/Filiann-n/Expressify/main/install.sh | bash
-```
+~~~
 
-To skip wallpaper sync on Linux: `curl -fsSL https://raw.githubusercontent.com/Filiann-n/Expressify/main/install.sh | bash -s -- --no-wallpaper-sync`
+If you don't want wallpaper sync on Linux:
+~~~bash
+curl -fsSL https://raw.githubusercontent.com/Filiann-n/Expressify/main/install.sh | bash -s -- --no-wallpaper-sync
+~~~
 
-## Wallpaper Sync
+> Both scripts only check that `spicetify` is installed — they won't install Spicetify for you.
 
-When **Dynamic track colors** is off in Spotify Settings, the theme uses `color.ini`. Refresh it from your wallpaper at any time:
+## Updating colors from your wallpaper
 
-- **Windows:** `& "$env:APPDATA\spicetify\Themes\M3Expressive\scripts\sync-wallpaper.ps1" -Apply`
-  Checks `ii-windows` (`colors.json`) -> `matugen` -> active Windows wallpaper -> Windows accent color.
-- **Linux:** `"${XDG_CONFIG_HOME:-$HOME/.config}/spicetify/Themes/M3Expressive/scripts/sync-wallpaper.sh" --apply`
-  Checks `quickshell` / `illogical-impulse` (`colors.json`) -> `matugen` -> active wallpaper (`swww`, `hyprpaper`, GNOME, XFCE, `feh`, `nitrogen`) -> `pywal`.
+When **Dynamic track colors** is off, the theme uses `color.ini`. To refresh it from your wallpaper manually:
 
-Optional style flag: `-Style` / `--style` (`tonal`, `expressive`, `vibrant`, `content`).
+- **Windows:**
+~~~powershell
+& "$env:APPDATA\spicetify\Themes\M3Expressive\scripts\sync-wallpaper.ps1" -Apply
+~~~
+  Looks for `ii-windows` (`colors.json`) -> `matugen` -> current Windows wallpaper -> Windows accent color.
+
+- **Linux:**
+~~~bash
+"${XDG_CONFIG_HOME:-$HOME/.config}/spicetify/Themes/M3Expressive/scripts/sync-wallpaper.sh" --apply
+~~~
+  Looks for `quickshell` / `illogical-impulse` (`colors.json`) -> `matugen` -> active wallpaper (`swww`, `hyprpaper`, GNOME, XFCE, `feh`, `nitrogen`) -> `pywal`.
+
+You can pass `-Style` / `--style` with `tonal`, `expressive`, `vibrant`, or `content`.
 
 ## Uninstall
 
-Restores the Spicetify theme you had before installing `M3Expressive`:
+- **Marketplace:** open **Marketplace -> Installed**, find **Expressify**, and click **Remove**.
+- **Windows:**
+~~~powershell
+irm https://raw.githubusercontent.com/Filiann-n/Expressify/main/uninstall.ps1 | iex
+~~~
+- **Linux:**
+~~~bash
+curl -fsSL https://raw.githubusercontent.com/Filiann-n/Expressify/main/uninstall.sh | bash
+~~~
 
-- **Windows:** `irm https://raw.githubusercontent.com/Filiann-n/Expressify/main/uninstall.ps1 | iex`
-- **Linux:** `curl -fsSL https://raw.githubusercontent.com/Filiann-n/Expressify/main/uninstall.sh | bash`
+Restores whatever theme you had before.
 
 ## License
 
