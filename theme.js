@@ -1920,7 +1920,15 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             }
 
             const img = row.querySelector("img");
-            const isCircle = /artist|user/i.test(row.getAttribute("data-entity-row") || "") || !!row.querySelector('[class*="circular" i]');
+            const rowType = row.getAttribute("data-entity-row") || "";
+            const isPlaylistOrAlbum =
+                /playlist|album|episode|show/i.test(rowType) ||
+                /(?:•|\b)(?:Playlist|Album|Single|EP|Podcast|Плейлист|Альбом|Сингл|Подкаст)\b/i.test(row.textContent || "");
+            const isCircle = !isPlaylistOrAlbum && (
+                /artist|profile/i.test(rowType) ||
+                !!row.querySelector('[class*="circular" i], [class*="circle" i], a[href*="/artist/"]') ||
+                /\bArtist\b|Исполнитель/i.test(row.textContent || "")
+            );
             if (img?.parentElement) {
                 addCls(img.parentElement, "m3e-entity-art");
                 if (isCircle) addCls(img.parentElement, "m3e-circle");
@@ -1929,10 +1937,14 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                 }
             }
 
-            const artWrap = img?.closest("div");
-            const pb = row.querySelector('.main-playButton-PlayButton button, [data-testid="play-button"], button[aria-label*="Play" i], button[aria-label*="Pause" i], button[aria-label*="Воспроизв" i], button[aria-label*="Пауз" i]')
-                || Array.from(row.querySelectorAll("button")).find((b) => artWrap && (artWrap.contains(b) || b.parentElement?.contains(artWrap)) && b.querySelector("svg"));
-            if (pb) {
+            const artSlot = img?.closest('[class*="header-side"], .m3e-entity-art-wrap') || img?.parentElement?.parentElement;
+            const pb = row.querySelector('.main-playButton-PlayButton button, [data-testid="play-button"]')
+                || Array.from(row.querySelectorAll('button:not([aria-expanded])')).find((b) => {
+                    const aria = (b.getAttribute("aria-label") || "").trim();
+                    const inArt = !!(artSlot && artSlot.contains(b));
+                    return inArt && (/^(?:Play|Pause|Воспроизв|Пауз)/i.test(aria) || !!b.querySelector("svg"));
+                });
+            if (pb && !pb.hasAttribute("aria-expanded")) {
                 addCls(pb, "m3e-entity-play-btn");
                 const wrap = pb.closest(".main-playButton-PlayButton") || pb;
                 if (wrap.parentElement && wrap.parentElement !== row) {

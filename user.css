@@ -1274,11 +1274,11 @@ html:not([data-m3e-borders="0"]) body .Root__right-sidebar > div section:not([ar
   inset: 0 !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"] :is([data-testid="listRowTitle"], [class*="list-row-title"], a) {
+.Root__right-sidebar [data-encore-id="listRow"]:not(.main-nowPlayingView-queueItem) :is([data-testid="listRowTitle"], [class*="list-row-title"], [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
   transition: color 0.16s ease !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"][class*="interactive"]:hover :is([data-testid="listRowTitle"], [data-testid="listRowTitle"] span, [class*="list-row-title"], [class*="list-row-title"] span, [class*="list-row-title"] a, a:not([data-encore-id="buttonSecondary"]), a:not([data-encore-id="buttonSecondary"]) span) {
+.Root__right-sidebar [data-encore-id="listRow"][class*="interactive"]:not(.main-nowPlayingView-queueItem):hover :is([data-testid="listRowTitle"], [data-testid="listRowTitle"] span, [class*="list-row-title"], [class*="list-row-title"] span, [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 .Root__right-sidebar .m3e-tour-row,
@@ -1309,8 +1309,72 @@ html:not([data-m3e-borders="0"]) body .Root__right-sidebar > div section:not([ar
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 .Root__right-sidebar .main-nowPlayingView-queueItem {
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   transition: background-color 0.2s ease !important;
+}
+
+.Root__right-sidebar .main-nowPlayingView-queueItem .x-entityImage-imageContainer,
+.Root__right-sidebar .main-nowPlayingView-queueItem .x-entityImage-imageContainer img {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+html body .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button,
+html body .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button:is(:hover, :active, :focus, :focus-visible) {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 10px !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html body .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button > span {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 9px !important;
+  background-color: var(--spice-m3-primary, #b8cac5) !important;
+  color: var(--spice-m3-on-primary, #233430) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: none !important;
+  transition: border-radius 0.2s cubic-bezier(0.2, 0, 0, 1), transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.16s ease !important;
+}
+
+.Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button:is([aria-label*="Pause" i], [aria-label*="Пауз" i]) > span {
+  border-radius: 50% !important;
+}
+
+.Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button:hover > span {
+  background-color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
+  transform: scale(1.08) !important;
+}
+
+.Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button svg {
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--spice-m3-on-primary, #233430) !important;
+  fill: currentColor !important;
+}
+
+.Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button:not([aria-label*="Pause" i]):not([aria-label*="Пауз" i]) svg {
+  transform: translateX(0.5px) !important;
 }
 
 .Root__right-sidebar .main-nowPlayingView-queueItem:hover {
@@ -1560,6 +1624,8 @@ html[data-m3e-mode="impulse"] body .Root__right-sidebar [style*="--lyrics-color-
   color: var(--spice-m3-on-primary-cont, #d4e7e1) !important;
   box-shadow: inset 0 0 0 1px rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.36) !important;
   font-weight: 600 !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 :is(.Root__main-view, .Root__nav-bar) :is(
@@ -2150,6 +2216,7 @@ html[data-m3e-plus="1"]:not([data-m3e-borders="0"]) body :is(.main-card-card, [d
 }
 
 /* Recents & Entity rows */
+
 .m3e-entity-grid {
   padding-block-start: 0 !important;
 }
@@ -2181,7 +2248,7 @@ html[data-m3e-plus="1"]:not([data-m3e-borders="0"]) body :is(.main-card-card, [d
 }
 
 .m3e-entity-row .m3e-entity-art.m3e-circle,
-.m3e-entity-row .m3e-entity-art.m3e-circle img {
+.m3e-entity-row .m3e-entity-art.m3e-circle :is(div, img) {
   border-radius: 50% !important;
 }
 
@@ -2905,9 +2972,9 @@ html:not([data-m3e-borders="0"]) body .main-trackList-trackListRow:has(.encore-i
 /* Link hover */
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]),
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):is(:hover, :focus-visible),
-:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):hover .encore-text,
+:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):hover [data-encore-id="text"],
 .Root__right-sidebar button:hover,
-.Root__right-sidebar [data-encore-id="listRow"]:hover [class*="list-row-title"] {
+.Root__right-sidebar [data-encore-id="listRow"]:hover :is([class*="list-row-title"], [data-encore-id="text"], a) {
   text-decoration: none !important;
   text-decoration-line: none !important;
 }
@@ -2917,12 +2984,12 @@ html:not([data-m3e-borders="0"]) body .main-trackList-trackListRow:has(.encore-i
 }
 
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover,
-:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover :is(.main-trackList-rowTitle, .encore-text) {
+:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover :is(.main-trackList-rowTitle, [data-encore-id="text"], [data-encore-id="listRowTitle"], [class*="list-row-title"]) {
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 
 #main [role="listitem"] > a:hover > div[style*="background-color"],
-#main [role="listitem"] > a:hover > div[style*="background-color"] .encore-text {
+#main [role="listitem"] > a:hover > div[style*="background-color"] [data-encore-id="text"] {
   color: #ffffff !important;
 }
 /* ==========================================================================
@@ -3886,8 +3953,12 @@ html:not([data-m3e-borders="0"]) body #main a[href*="/browse/"]:hover > div[styl
 /* Search & Library rows */
 
 .m3e-entity-card {
+  border-radius: 16px !important;
+  margin-bottom: 6px !important;
   background-color: rgba(var(--spice-rgb-m3-surface-high, 41, 42, 42), 0.45) !important;
   box-shadow: none !important;
+  overflow: hidden !important;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 html:not([data-m3e-borders="0"]) body .m3e-entity-card {
