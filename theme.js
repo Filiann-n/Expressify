@@ -42,7 +42,7 @@
     }
 
     function setThemeStylesDisabled(disabled) {
-        document.querySelectorAll('link[href*="user.css"]').forEach((el) => {
+        document.querySelectorAll('link[href*="user.css"], style.marketplaceUserCSS, style.marketplaceScheme').forEach((el) => {
             el.disabled = disabled;
         });
         if (disabled) applyVanillaSpiceColors();
@@ -64,6 +64,8 @@
 
     if (isThemeDisabled) {
         setThemeStylesDisabled(true);
+        setTimeout(() => setThemeStylesDisabled(true), 800);
+        setTimeout(() => setThemeStylesDisabled(true), 2200);
     }
 
     const STORAGE_KEY = "m3e_color_mode";
@@ -676,6 +678,13 @@
                 opacity: 0.92;
                 transform: scale(1.03);
             }
+            html[data-m3e-borders="0"] .m3e-dd-trigger,
+            html[data-m3e-borders="0"] .m3e-dd-trigger:hover:not(:disabled),
+            html[data-m3e-borders="0"] .m3e-dd-trigger[aria-expanded="true"],
+            html[data-m3e-borders="0"] .m3e-dd-menu,
+            html[data-m3e-borders="0"] .m3e-modal-card {
+                border-color: transparent !important;
+            }
         `;
         document.head.appendChild(st);
     }
@@ -692,8 +701,8 @@
         trackOnDesc: "Интерфейс подстраивается под текущий трек",
         trackOffDesc: "Используется палитра системных обоев",
         plusDesc: "Подсветка плиток и карточек в цвет их обложки",
-        bordersLabel: "Обводка карточек",
-        bordersDesc: "Показывать рамку вокруг плиток и карточек",
+        bordersLabel: "Обводка интерфейса",
+        bordersDesc: "Показывать тонкие рамки у карточек, панелей и кнопок",
         styleLabel: "Стиль палитры",
         styleDesc: "Задаёт яркость и контраст оттенков",
         styles: {
@@ -706,8 +715,8 @@
         toastWallpaper: "Цвета: системные обои",
         toastPlusOn: "Expressive+ включён",
         toastPlusOff: "Expressive+ выключен",
-        toastBordersOn: "Обводка карточек включена",
-        toastBordersOff: "Обводка карточек выключена",
+        toastBordersOn: "Обводка интерфейса включена",
+        toastBordersOff: "Обводка интерфейса выключена",
         toastStyle: "Стиль палитры: "
     } : {
         reloadTitle: "Reload Spotify?",
@@ -720,8 +729,8 @@
         trackOnDesc: "Match interface palette to the current track artwork",
         trackOffDesc: "Using system wallpaper palette",
         plusDesc: "Tint Home tiles and cards with their artwork",
-        bordersLabel: "Card outlines",
-        bordersDesc: "Show borders around tiles and cards",
+        bordersLabel: "UI outlines",
+        bordersDesc: "Show borders around cards, panels, and controls",
         styleLabel: "Palette style",
         styleDesc: "Controls accent saturation and contrast",
         styles: {
@@ -734,8 +743,8 @@
         toastWallpaper: "Colors: system wallpaper",
         toastPlusOn: "Expressive+ enabled",
         toastPlusOff: "Expressive+ disabled",
-        toastBordersOn: "Card outlines enabled",
-        toastBordersOff: "Card outlines disabled",
+        toastBordersOn: "UI outlines enabled",
+        toastBordersOff: "UI outlines disabled",
         toastStyle: "Palette style: "
     };
 

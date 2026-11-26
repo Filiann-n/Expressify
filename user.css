@@ -3410,3 +3410,56 @@ html body .x-toggle-wrapper input:checked:hover:not([disabled], :active) ~ .x-to
 .x-settings-restartAppButton {
   border-radius: 12px !important;
 }
+
+/* Global UI outlines off (data-m3e-borders="0") */
+html[data-m3e-borders="0"] body .Root__nav-bar,
+html[data-m3e-borders="0"] body .Root__right-sidebar,
+html[data-m3e-borders="0"] body .Root__main-view,
+html[data-m3e-borders="0"] body :is([data-encore-id="popover"]:has(> [role="menu"]), .mtbEdxr7a5xkrPujQt24),
+html[data-m3e-borders="0"] body :is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"]) div:has(> input),
+html[data-m3e-borders="0"] body :is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"]) div:has(> input):is(:hover, :focus-within),
+html[data-m3e-borders="0"] body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24, [role="menu"]) input.x-filterBox-filterInput,
+html[data-m3e-borders="0"] body :is([data-encore-id="popover"], .mtbEdxr7a5xkrPujQt24, [role="menu"]) input.x-filterBox-filterInput:focus,
+html[data-m3e-borders="0"] body .notistack-Snackbar > div > div,
+html[data-m3e-borders="0"] body .encore-announcement-set {
+  border-color: transparent !important;
+}
+
+html[data-m3e-borders="0"] body .main-nowPlayingBar-container {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.42) !important;
+}
+
+html[data-m3e-borders="0"] body :is(.yp9K_GG6MgsoxKPtPMPE, .main-contextMenu-menu, [role="menu"], .ZNdHcrLKbf8H6SBKh71v, [class*="-menu"][role="menu"]) {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.52) !important;
+}
+
+html[data-m3e-borders="0"] body :is(.tippy-box, .main-contextMenu-tippy, [role="tooltip"], [data-encore-id="tooltip"], .main-tooltip-tooltip, .main-tooltip-tooltip-small):not(:has([role="menu"])) {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-m3e-borders="0"] body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"]):is([aria-checked="true"], [aria-checked="mixed"]),
+html[data-m3e-borders="0"] body .main-nowPlayingBar-center button:is([data-testid="control-button-shuffle"], [data-testid="control-button-repeat"]):is([aria-checked="true"], [aria-checked="mixed"]):hover,
+html[data-m3e-borders="0"] body .main-nowPlayingBar-right button:is([aria-pressed="true"], [aria-checked="true"], .main-genericButton-buttonActive),
+html[data-m3e-borders="0"] body .main-nowPlayingBar-right button:is([aria-pressed="true"], [aria-checked="true"], .main-genericButton-buttonActive):hover,
+html[data-m3e-borders="0"] body .main-nowPlayingBar-right button:is(.m3e-dj-btn, [aria-label*="DJ" i], [data-testid*="dj" i]):hover,
+html[data-m3e-borders="0"] body .Root__right-sidebar .main-nowPlayingView-section:not(.m3e-lyrics-card),
+html[data-m3e-borders="0"] body .pDYh0zFb7QjZraY2dACF,
+html[data-m3e-borders="0"] body .Dft16ajzNIZQXnIXoXjF,
+html[data-m3e-borders="0"] body :is(button[role="checkbox"][aria-checked], button[role="radio"][aria-checked], [data-encore-id="chip"]:not(:has(button)):not(button *)),
+html[data-m3e-borders="0"] body :is(button[role="checkbox"][aria-checked="true"], button[role="radio"][aria-checked="true"], [data-encore-id="chip"][aria-checked="true"]:not(:has(button)):not(button *), [data-encore-id="chip"][aria-pressed="true"]:not(:has(button)):not(button *)),
+html[data-m3e-borders="0"] body :is(button[role="checkbox"][aria-checked="true"]:hover, button[role="radio"][aria-checked="true"]:hover, [data-encore-id="chip"][aria-checked="true"]:not(:has(button)):not(button *):hover, [data-encore-id="chip"][aria-pressed="true"]:not(:has(button)):not(button *):hover),
+html[data-m3e-borders="0"] body button[data-encore-id="buttonSecondary"],
+html[data-m3e-borders="0"] body .Root__right-sidebar button[data-encore-id="buttonSecondary"],
+html[data-m3e-borders="0"] body button[data-encore-id="buttonSecondary"]:hover,
+html[data-m3e-borders="0"] body .main-actionBar-ActionBar :is(.x-sortBox-sortDropdown, button[aria-label*="View" i], button[aria-label*="Sort" i], button[aria-label*="Вид" i], button[aria-label*="Сортир" i]),
+html[data-m3e-borders="0"] body .U48pbymREy3Yv4iSRCur button:not([aria-checked="true"]):not([aria-pressed="true"]),
+html[data-m3e-borders="0"] body .x-toggle-wrapper .x-toggle-indicatorWrapper,
+html[data-m3e-borders="0"] body .x-toggle-wrapper input:hover:not([disabled], :active) ~ .x-toggle-indicatorWrapper,
+html[data-m3e-borders="0"] body .main-dropDown-dropDown,
+html[data-m3e-borders="0"] body .main-dropDown-dropDown:hover:not(:disabled),
+html[data-m3e-borders="0"] body .main-dropDown-dropDown:focus-visible,
+html[data-m3e-borders="0"] body .x-settings-section input:not([type="checkbox"]):not([type="range"]),
+html[data-m3e-borders="0"] body .x-settings-section input:not([type="checkbox"]):not([type="range"]):focus,
+html[data-m3e-borders="0"] body .x-settings-equalizerSection {
+  box-shadow: none !important;
+}

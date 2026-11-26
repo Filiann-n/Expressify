@@ -1,0 +1,25 @@
+{
+  "name": "Expressify",
+  "description": "Material 3 Expressive theme for Spotify with floating rounded panels, wavy progress bar, dynamic artwork colors, Expressive+ card tinting, and customizable UI outlines.",
+  "preview": "preview.png",
+  "readme": "README.md",
+  "usercss": "user.css",
+  "schemes": "color.ini",
+  "include": [
+    "https://filiann-n.github.io/Expressify/theme.js"
+  ],
+  "branch": "main",
+  "authors": [
+    {
+      "name": "Filiann-n",
+      "url": "https://github.com/Filiann-n"
+    }
+  ],
+  "tags": [
+    "material",
+    "dynamic",
+    "dark",
+    "rounded",
+    "m3"
+  ]
+}
