@@ -689,7 +689,7 @@
         document.head.appendChild(st);
     }
 
-    const IS_RU = /^ru/i.test(navigator.language || Spicetify.Locale?.getLocale?.() || "");
+    const IS_RU = /^ru/i.test(Spicetify.Locale?.getLocale?.() || navigator.language || "");
     const STR = IS_RU ? {
         reloadTitle: "Перезагрузить Spotify?",
         reloadDesc: "Включение или отключение M3 Expressive вступит в силу после перезапуска интерфейса.",
