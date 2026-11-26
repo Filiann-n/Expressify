@@ -94,7 +94,7 @@
         "--spice-m3-tertiary", "--spice-m3-outline", "--spice-m3-outline-variant",
         "--spice-m3-on-surface", "--spice-m3-on-surface-var",
         "--spice-rgb-m3-primary", "--spice-rgb-m3-secondary-cont",
-        "--spice-rgb-m3-outline", "--spice-rgb-m3-outline-variant", "--spice-rgb-m3-on-surface",
+        "--spice-rgb-m3-outline", "--spice-rgb-m3-outline-variant", "--spice-rgb-m3-on-surface", "--spice-rgb-m3-surface-high", "--spice-rgb-m3-surface-highest",
         "--spice-button", "--spice-button-active", "--spice-text", "--spice-subtext",
         "--spice-main", "--spice-sidebar", "--spice-player", "--spice-card"
     ];
@@ -394,6 +394,8 @@
             "--spice-rgb-m3-outline": hslRgbStr(bgH, 8, 57),
             "--spice-rgb-m3-outline-variant": hslRgbStr(bgH, bgSat, 28),
             "--spice-rgb-m3-on-surface": hslRgbStr(bgH, 12, 91),
+            "--spice-rgb-m3-surface-high": hslRgbStr(bgH, bgSat + 2, 17),
+            "--spice-rgb-m3-surface-highest": hslRgbStr(bgH, bgSat + 3, 22),
 
             "--spice-button": pHex,
             "--spice-button-active": onPContHex,

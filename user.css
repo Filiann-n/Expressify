@@ -1377,9 +1377,7 @@ html body .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-P
   transform: translateX(0.5px) !important;
 }
 
-.Root__right-sidebar .main-nowPlayingView-queueItem:hover {
-  background-color: rgba(var(--spice-rgb-m3-surface-highest, 52, 53, 52), 0.65) !important;
-}
+
 
 .Root__right-sidebar:not(:hover) .main-nowPlayingView-headerCloseButton {
   opacity: 0 !important;
