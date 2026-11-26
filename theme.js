@@ -1910,7 +1910,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         }
 
         // Entity / Recents rows ([data-entity-row])
-        for (const row of document.querySelectorAll('[data-entity-row]:not(.m3e-entity-row)')) {
+        for (const row of (mainView ? mainView.querySelectorAll('[data-entity-row]:not(.m3e-entity-row)') : [])) {
             addCls(row, "m3e-entity-row");
             if (row.parentElement) addCls(row.parentElement, "m3e-entity-grid");
 

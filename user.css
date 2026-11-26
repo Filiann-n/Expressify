@@ -1258,27 +1258,24 @@ html:not([data-m3e-borders="0"]) body .Root__right-sidebar > div section:not([ar
   overflow: hidden !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"],
-.Root__right-sidebar [class*="list-row"]:not([class*="list-row__"]) {
+.Root__right-sidebar [data-encore-id="listRow"] {
   border-radius: 14px !important;
   --bg-inset-change-press: 0px !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"]::after,
-.Root__right-sidebar [class*="list-row"]:not([class*="list-row__"])::after {
+.Root__right-sidebar [data-encore-id="listRow"]::after {
   border-radius: 14px !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"]:active::after,
-.Root__right-sidebar [class*="list-row"]:not([class*="list-row__"]):active::after {
+.Root__right-sidebar [data-encore-id="listRow"]:active::after {
   inset: 0 !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"]:not(.main-nowPlayingView-queueItem) :is([data-testid="listRowTitle"], [class*="list-row-title"], [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
+.Root__right-sidebar [data-encore-id="listRow"]:not(.main-nowPlayingView-queueItem) :is([data-encore-id="listRowTitle"], [data-testid="listRowTitle"], [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
   transition: color 0.16s ease !important;
 }
 
-.Root__right-sidebar [data-encore-id="listRow"][class*="interactive"]:not(.main-nowPlayingView-queueItem):hover :is([data-testid="listRowTitle"], [data-testid="listRowTitle"] span, [class*="list-row-title"], [class*="list-row-title"] span, [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
+.Root__right-sidebar [data-encore-id="listRow"][class*="interactive"]:not(.main-nowPlayingView-queueItem):hover :is([data-encore-id="listRowTitle"], [data-testid="listRowTitle"], [class*="list-row__column"] > [data-encore-id="text"]:first-child) {
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 .Root__right-sidebar .m3e-tour-row,
@@ -1376,8 +1373,6 @@ html body .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-P
 .Root__right-sidebar .main-nowPlayingView-queueItem .main-playButton-PlayButton button:not([aria-label*="Pause" i]):not([aria-label*="Пауз" i]) svg {
   transform: translateX(0.5px) !important;
 }
-
-
 
 .Root__right-sidebar:not(:hover) .main-nowPlayingView-headerCloseButton {
   opacity: 0 !important;
@@ -2972,7 +2967,7 @@ html:not([data-m3e-borders="0"]) body .main-trackList-trackListRow:has(.encore-i
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):is(:hover, :focus-visible),
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):hover [data-encore-id="text"],
 .Root__right-sidebar button:hover,
-.Root__right-sidebar [data-encore-id="listRow"]:hover :is([class*="list-row-title"], [data-encore-id="text"], a) {
+.Root__right-sidebar [data-encore-id="listRow"]:hover :is([data-encore-id="listRowTitle"], [data-encore-id="text"], a) {
   text-decoration: none !important;
   text-decoration-line: none !important;
 }
@@ -2982,7 +2977,7 @@ html:not([data-m3e-borders="0"]) body .main-trackList-trackListRow:has(.encore-i
 }
 
 :is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover,
-:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover :is(.main-trackList-rowTitle, [data-encore-id="text"], [data-encore-id="listRowTitle"], [class*="list-row-title"]) {
+:is(.Root__main-view, .Root__nav-bar, .Root__right-sidebar, .main-nowPlayingBar-container, #search-dropdown) :is(a, [role="link"]):not([data-encore-id="buttonSecondary"]):not([data-encore-id="buttonPrimary"]):not(.main-shelf-seeAll):not([data-testid="see-all-link"]):not([href*="/genre/"]):not([href*="/browse/"]):not([href*="/concert/"]):hover :is(.main-trackList-rowTitle, [data-encore-id="text"], [data-encore-id="listRowTitle"]) {
   color: var(--spice-m3-primary, #b8cac5) !important;
 }
 
@@ -4196,7 +4191,6 @@ html[data-m3e-borders="0"] body button[data-encore-id="buttonSecondary"],
 html[data-m3e-borders="0"] body .Root__right-sidebar button[data-encore-id="buttonSecondary"],
 html[data-m3e-borders="0"] body button[data-encore-id="buttonSecondary"]:hover,
 html[data-m3e-borders="0"] body .main-actionBar-ActionBar :is(.x-sortBox-sortDropdown, button[aria-label*="View" i], button[aria-label*="Sort" i], button[aria-label*="Вид" i], button[aria-label*="Сортир" i]),
-html[data-m3e-borders="0"] body .m3e-wn-filters button:not([aria-checked="true"]):not([aria-pressed="true"]),
 html[data-m3e-borders="0"] body .x-toggle-wrapper .x-toggle-indicatorWrapper,
 html[data-m3e-borders="0"] body .x-toggle-wrapper input:hover:not([disabled], :active) ~ .x-toggle-indicatorWrapper,
 html[data-m3e-borders="0"] body .main-dropDown-dropDown,
