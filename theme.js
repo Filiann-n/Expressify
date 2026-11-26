@@ -1,5 +1,10 @@
 (async function M3ExpressiveTheme() {
     const DISABLED_KEY = "m3e_theme_disabled";
+    try {
+        const plat = (navigator.platform || navigator.userAgent || "").toLowerCase();
+        document.documentElement.dataset.m3eOs = plat.includes("linux") ? "linux" : (plat.includes("mac") ? "mac" : "win");
+    } catch {}
+
     const getThemeDisabled = () => {
         try { return localStorage.getItem(DISABLED_KEY) === "1"; } catch { return false; }
     };
@@ -55,6 +60,12 @@
         try {
             document.documentElement.dataset.m3eBorders =
                 localStorage.getItem("m3e_card_borders") === "0" ? "0" : "1";
+            document.documentElement.dataset.m3eShortcuts =
+                localStorage.getItem("m3e_show_shortcuts") === "1" ? "1" : "0";
+            document.documentElement.dataset.m3eMode =
+                localStorage.getItem("m3e_color_mode") === "track" ? "track" : "impulse";
+            document.documentElement.dataset.m3eLibbar =
+                localStorage.getItem("m3e_lib_playing_bar") === "1" ? "1" : "0";
         } catch {}
     }
 
@@ -70,6 +81,11 @@
 
     const STORAGE_KEY = "m3e_color_mode";
     const STYLE_KEY = "m3e_palette_style";
+    const PLUS_KEY = "m3e_expressive_plus";
+    const BORDERS_KEY = "m3e_card_borders";
+    const SHORTCUTS_KEY = "m3e_show_shortcuts";
+    const LIBBAR_KEY = "m3e_lib_playing_bar";
+
     const VARS = [
         "--spice-m3-surface", "--spice-m3-surface-lowest", "--spice-m3-surface-low",
         "--spice-m3-surface-container", "--spice-m3-surface-high", "--spice-m3-surface-highest",
@@ -90,7 +106,6 @@
         } catch {}
         return localStorage.getItem(STORAGE_KEY) === "track" ? "track" : "impulse";
     }
-
     function saveMode(mode) {
         localStorage.setItem(STORAGE_KEY, mode);
         try { Spicetify.LocalStorage?.set?.(STORAGE_KEY, mode); } catch {}
@@ -100,12 +115,83 @@
         const v = localStorage.getItem(STYLE_KEY);
         return ["tonal", "expressive", "vibrant", "content"].includes(v) ? v : "tonal";
     }
-
     function savePaletteStyle(style) {
         localStorage.setItem(STYLE_KEY, style);
     }
 
+    function getExpressivePlus() {
+        try {
+            const v = Spicetify.LocalStorage?.get?.(PLUS_KEY);
+            if (v === "0" || v === "1") return v === "1";
+        } catch {}
+        const lv = localStorage.getItem(PLUS_KEY);
+        return lv === null ? true : lv === "1";
+    }
+    function saveExpressivePlus(on) {
+        const val = on ? "1" : "0";
+        localStorage.setItem(PLUS_KEY, val);
+        try { Spicetify.LocalStorage?.set?.(PLUS_KEY, val); } catch {}
+    }
+
+    function getBordersEnabled() {
+        try {
+            const v = Spicetify.LocalStorage?.get?.(BORDERS_KEY);
+            if (v === "0" || v === "1") return v === "1";
+        } catch {}
+        const lv = localStorage.getItem(BORDERS_KEY);
+        return lv === null ? true : lv === "1";
+    }
+    function saveBordersEnabled(on) {
+        const val = on ? "1" : "0";
+        localStorage.setItem(BORDERS_KEY, val);
+        try { Spicetify.LocalStorage?.set?.(BORDERS_KEY, val); } catch {}
+    }
+    function syncBordersState() {
+        document.documentElement.dataset.m3eBorders = getBordersEnabled() ? "1" : "0";
+    }
+
+    function getShortcutsEnabled() {
+        try {
+            const v = Spicetify.LocalStorage?.get?.(SHORTCUTS_KEY);
+            if (v === "0" || v === "1") return v === "1";
+        } catch {}
+        return localStorage.getItem(SHORTCUTS_KEY) === "1";
+    }
+    function saveShortcutsEnabled(on) {
+        const val = on ? "1" : "0";
+        localStorage.setItem(SHORTCUTS_KEY, val);
+        try { Spicetify.LocalStorage?.set?.(SHORTCUTS_KEY, val); } catch {}
+    }
+    function syncShortcutsState() {
+        document.documentElement.dataset.m3eShortcuts = getShortcutsEnabled() ? "1" : "0";
+    }
+
+    function getLibBarEnabled() {
+        try {
+            const v = Spicetify.LocalStorage?.get?.(LIBBAR_KEY);
+            if (v === "0" || v === "1") return v === "1";
+        } catch {}
+        return localStorage.getItem(LIBBAR_KEY) === "1";
+    }
+    function saveLibBarEnabled(on) {
+        const val = on ? "1" : "0";
+        localStorage.setItem(LIBBAR_KEY, val);
+        try { Spicetify.LocalStorage?.set?.(LIBBAR_KEY, val); } catch {}
+    }
+    function syncLibBarState() {
+        document.documentElement.dataset.m3eLibbar = getLibBarEnabled() ? "1" : "0";
+    }
+
+    let colorMorphTimer = null;
+    function triggerColorMorph(ms = 380) {
+        const rootEl = document.documentElement;
+        rootEl.classList.add("m3e-theme-morph");
+        clearTimeout(colorMorphTimer);
+        colorMorphTimer = setTimeout(() => rootEl.classList.remove("m3e-theme-morph"), ms);
+    }
+
     function clearTrackOverrides() {
+        triggerColorMorph(380);
         const root = document.documentElement.style;
         for (const v of VARS) root.removeProperty(v);
     }
@@ -170,8 +256,31 @@
         return hslToRgb(h, s, l).join(", ");
     }
 
+    let sampleCanvas = null;
+    let sampleCtx = null;
+    function getSampleCtx() {
+        if (!sampleCanvas) {
+            sampleCanvas = document.createElement("canvas");
+            sampleCanvas.width = 16;
+            sampleCanvas.height = 16;
+            sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
+        }
+        return sampleCtx;
+    }
+
+    const trackRgbCache = new Map();
     async function extractCoverRgb(item) {
         const uri = item?.uri;
+        if (uri && trackRgbCache.has(uri)) return trackRgbCache.get(uri);
+
+        const cacheAndReturn = (rgb) => {
+            if (uri && rgb) {
+                if (trackRgbCache.size > 80) trackRgbCache.clear();
+                trackRgbCache.set(uri, rgb);
+            }
+            return rgb;
+        };
+
         if (uri && typeof Spicetify.colorExtractor === "function") {
             try {
                 const res = await Promise.race([
@@ -180,27 +289,26 @@
                 ]);
                 const pick = res?.VIBRANT || res?.PROMINENT || res?.LIGHT_VIBRANT || res?.DARK_VIBRANT || Object.values(res || {})[0];
                 const rgb = hexToRgb(pick);
-                if (rgb) return rgb;
+                if (rgb) return cacheAndReturn(rgb);
             } catch {}
         }
 
-        const rawUrl = item?.metadata?.image_url || "";
+        const rawUrl = item?.metadata?.image_small_url || item?.metadata?.image_url || "";
         if (!rawUrl) return null;
         const imgUrl = rawUrl.startsWith("spotify:image:")
             ? `https://i.scdn.co/image/${rawUrl.replace("spotify:image:", "")}`
             : rawUrl;
 
-        return await new Promise((resolve) => {
+        const sampled = await new Promise((resolve) => {
             const img = new Image();
             img.crossOrigin = "Anonymous";
+            img.decoding = "async";
             img.onload = () => {
                 try {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = 24;
-                    canvas.height = 24;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(img, 0, 0, 24, 24);
-                    const data = ctx.getImageData(0, 0, 24, 24).data;
+                    const ctx = getSampleCtx();
+                    ctx.clearRect(0, 0, 16, 16);
+                    ctx.drawImage(img, 0, 0, 16, 16);
+                    const data = ctx.getImageData(0, 0, 16, 16).data;
                     let best = [184, 202, 197];
                     let bestScore = -1;
                     for (let i = 0; i < data.length; i += 4) {
@@ -211,13 +319,12 @@
                         if (score > bestScore) { bestScore = score; best = [r, g, b]; }
                     }
                     resolve(best);
-                } catch {
-                    resolve(null);
-                }
+                } catch { resolve(null); }
             };
             img.onerror = () => resolve(null);
             img.src = imgUrl;
         });
+        return cacheAndReturn(sampled);
     }
 
     let trackReqId = 0;
@@ -298,47 +405,18 @@
             "--spice-card": hslHex(bgH, bgSat + 2, 17)
         };
 
+        triggerColorMorph(380);
         for (const [k, v] of Object.entries(map)) {
             root.setProperty(k, v);
         }
     }
 
-    const PLUS_KEY = "m3e_expressive_plus";
-    function getExpressivePlus() {
-        try {
-            const v = Spicetify.LocalStorage?.get?.(PLUS_KEY);
-            if (v === "0" || v === "1") return v === "1";
-        } catch {}
-        const lv = localStorage.getItem(PLUS_KEY);
-        return lv === null ? true : lv === "1";
-    }
-    function saveExpressivePlus(on) {
-        const val = on ? "1" : "0";
-        localStorage.setItem(PLUS_KEY, val);
-        try { Spicetify.LocalStorage?.set?.(PLUS_KEY, val); } catch {}
-    }
     function syncPlusState() {
-        const active = getMode() === "track" && getExpressivePlus();
+        const mode = getMode();
+        document.documentElement.dataset.m3eMode = mode;
+        const active = mode === "track" && getExpressivePlus();
         document.documentElement.dataset.m3ePlus = active ? "1" : "0";
         if (active) setTimeout(tintPlayingShortcuts, 80);
-    }
-
-    const BORDERS_KEY = "m3e_card_borders";
-    function getBordersEnabled() {
-        try {
-            const v = Spicetify.LocalStorage?.get?.(BORDERS_KEY);
-            if (v === "0" || v === "1") return v === "1";
-        } catch {}
-        const lv = localStorage.getItem(BORDERS_KEY);
-        return lv === null ? true : lv === "1";
-    }
-    function saveBordersEnabled(on) {
-        const val = on ? "1" : "0";
-        localStorage.setItem(BORDERS_KEY, val);
-        try { Spicetify.LocalStorage?.set?.(BORDERS_KEY, val); } catch {}
-    }
-    function syncBordersState() {
-        document.documentElement.dataset.m3eBorders = getBordersEnabled() ? "1" : "0";
     }
 
     const tileColorCache = new Map();
@@ -357,12 +435,11 @@
         const rgb = await new Promise((resolve) => {
             const img = new Image();
             img.crossOrigin = "Anonymous";
+            img.decoding = "async";
             img.onload = () => {
                 try {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = 16;
-                    canvas.height = 16;
-                    const ctx = canvas.getContext("2d");
+                    const ctx = getSampleCtx();
+                    ctx.clearRect(0, 0, 16, 16);
                     ctx.drawImage(img, 0, 0, 16, 16);
                     const data = ctx.getImageData(0, 0, 16, 16).data;
                     let best = null, bestScore = -1;
@@ -390,6 +467,7 @@
             onP: hslHex(h, Math.min(68, sat), 16),
             rgb: hslRgbStr(h, sat, 62)
         };
+        if (tileColorCache.size > 160) tileColorCache.clear();
         tileColorCache.set(imgUrl, res);
         return res;
     }
@@ -421,32 +499,33 @@
     }
 
     let prewarmTimer = null;
+    let prewarmSeq = 0;
     function prewarmExpressiveCards() {
         if (document.documentElement.dataset.m3ePlus !== "1") return;
-        const cards = document.querySelectorAll(".view-homeShortcutsGrid-shortcut, .main-card-card, [data-encore-id='card']");
-        let i = 0;
-        for (const c of cards) {
-            if (!c.dataset.m3eImg && i++ < 32) applyCardColor(c);
-        }
+        const seq = ++prewarmSeq;
+        const queue = Array.from(document.querySelectorAll(".view-homeShortcutsGrid-shortcut"))
+            .filter((c) => !c.dataset.m3eImg)
+            .slice(0, 8);
+        let idx = 0;
+        const step = () => {
+            if (seq !== prewarmSeq || idx >= queue.length || document.documentElement.dataset.m3ePlus !== "1") return;
+            applyCardColor(queue[idx++]);
+            if (idx < queue.length) {
+                if (typeof requestIdleCallback === "function") requestIdleCallback(step, { timeout: 250 });
+                else setTimeout(step, 60);
+            }
+        };
+        step();
     }
-    const schedulePrewarm = (delay = 350) => {
+    const schedulePrewarm = (delay = 700) => {
         if (document.documentElement.dataset.m3ePlus !== "1") return;
         clearTimeout(prewarmTimer);
         prewarmTimer = setTimeout(prewarmExpressiveCards, delay);
     };
     if (Spicetify.Platform?.History?.listen) {
-        Spicetify.Platform.History.listen(() => schedulePrewarm(450));
+        Spicetify.Platform.History.listen(() => schedulePrewarm(800));
     }
-    setTimeout(prewarmExpressiveCards, 900);
-    setTimeout(prewarmExpressiveCards, 2000);
-    setTimeout(prewarmExpressiveCards, 3800);
-    const warmWait = setInterval(() => {
-        if (document.querySelector(".view-homeShortcutsGrid-shortcut img")) {
-            prewarmExpressiveCards();
-            clearInterval(warmWait);
-        }
-    }, 600);
-    setTimeout(() => clearInterval(warmWait), 12000);
+    setTimeout(prewarmExpressiveCards, 1500);
 
     document.addEventListener("pointerover", (e) => {
         if (document.documentElement.dataset.m3ePlus !== "1") return;
@@ -463,6 +542,35 @@
             #m3e-style-row,
             #m3e-style-row .x-settings-secondColumn {
                 overflow: visible !important;
+            }
+            #m3e-settings-section {
+                display: grid !important;
+                gap: 8px !important;
+            }
+            #m3e-settings-section .x-settings-headerContainer {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+            }
+            #m3e-settings-section .x-settings-row {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) auto !important;
+                gap: 8px 24px !important;
+                padding-block: 8px !important;
+                align-items: center !important;
+            }
+            #m3e-settings-section .x-settings-firstColumn {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                text-align: left !important;
+                gap: 4px !important;
+            }
+            #m3e-settings-section .x-settings-secondColumn {
+                display: flex !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
             }
             .m3e-row-disabled {
                 opacity: 0.44 !important;
@@ -572,12 +680,13 @@
             .m3e-dd-opt {
                 width: 100%;
                 border: none;
-                border-radius: 10px;
+                border-radius: 12px;
                 padding: 9px 12px;
                 background: transparent;
                 color: var(--spice-m3-on-surface, #ffffff);
                 font: inherit;
                 font-size: 13.5px;
+                font-weight: 400;
                 text-align: left;
                 display: flex;
                 align-items: center;
@@ -587,12 +696,12 @@
                 transition: background-color 0.14s ease, color 0.14s ease;
             }
             .m3e-dd-opt:hover {
-                background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.12);
+                background-color: rgba(var(--spice-rgb-m3-on-surface, 227, 226, 225), 0.08);
             }
             .m3e-dd-opt[aria-selected="true"] {
-                background-color: rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.22);
-                color: var(--spice-m3-primary, #b8cac5);
-                font-weight: 600;
+                background-color: var(--spice-m3-secondary-cont, #3f4946);
+                color: var(--spice-m3-on-secondary-cont, #dae5e1);
+                font-weight: 500;
             }
             .m3e-dd-check {
                 width: 16px;
@@ -660,9 +769,7 @@
                 cursor: pointer;
                 transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease, background-color 0.15s ease;
             }
-            .m3e-modal-btn:active {
-                transform: scale(0.95);
-            }
+            .m3e-modal-btn:active { transform: scale(0.95); }
             .m3e-modal-btn-later {
                 background-color: rgba(var(--spice-rgb-m3-outline-variant, 120, 120, 120), 0.25);
                 color: var(--spice-m3-on-surface, #ffffff);
@@ -703,20 +810,23 @@
         plusDesc: "Подсветка плиток и карточек в цвет их обложки",
         bordersLabel: "Обводка интерфейса",
         bordersDesc: "Показывать тонкие рамки у карточек, панелей и кнопок",
+        shortcutsLabel: "Подсказки клавиш",
+        shortcutsDesc: "Показывать комбинации (Ctrl L, P, S, Alt и др.) в меню и поиске",
+        libBarLabel: "Полоска на играющем плейлисте",
+        libBarDesc: "Показывать индикатор в левом баре на играющем плейлисте (выкл — на открытом)",
         styleLabel: "Стиль палитры",
         styleDesc: "Задаёт яркость и контраст оттенков",
-        styles: {
-            tonal: "Сбалансированный",
-            expressive: "Контрастный",
-            vibrant: "Яркий",
-            content: "Цвет обложки"
-        },
+        styles: { tonal: "Сбалансированный", expressive: "Контрастный", vibrant: "Яркий", content: "Цвет обложки" },
         toastTrack: "Цвета: обложка трека",
         toastWallpaper: "Цвета: системные обои",
         toastPlusOn: "Expressive+ включён",
         toastPlusOff: "Expressive+ выключен",
         toastBordersOn: "Обводка интерфейса включена",
         toastBordersOff: "Обводка интерфейса выключена",
+        toastShortcutsOn: "Подсказки клавиш включены",
+        toastShortcutsOff: "Подсказки клавиш скрыты",
+        toastLibBarOn: "Полоска: на играющем плейлисте",
+        toastLibBarOff: "Полоска: на открытом плейлисте",
         toastStyle: "Стиль палитры: "
     } : {
         reloadTitle: "Reload Spotify?",
@@ -731,27 +841,29 @@
         plusDesc: "Tint Home tiles and cards with their artwork",
         bordersLabel: "UI outlines",
         bordersDesc: "Show borders around cards, panels, and controls",
+        shortcutsLabel: "Keyboard shortcuts",
+        shortcutsDesc: "Show shortcut hints (Ctrl L, P, S, Alt, etc.) in menus and search",
+        libBarLabel: "Playing indicator in sidebar",
+        libBarDesc: "Show left sidebar indicator on the playing playlist instead of the open page",
         styleLabel: "Palette style",
         styleDesc: "Controls accent saturation and contrast",
-        styles: {
-            tonal: "Balanced",
-            expressive: "Contrast",
-            vibrant: "Vibrant",
-            content: "Cover match"
-        },
+        styles: { tonal: "Balanced", expressive: "Contrast", vibrant: "Vibrant", content: "Cover match" },
         toastTrack: "Colors: track artwork",
         toastWallpaper: "Colors: system wallpaper",
         toastPlusOn: "Expressive+ enabled",
         toastPlusOff: "Expressive+ disabled",
         toastBordersOn: "UI outlines enabled",
         toastBordersOff: "UI outlines disabled",
+        toastShortcutsOn: "Keyboard shortcuts shown",
+        toastShortcutsOff: "Keyboard shortcuts hidden",
+        toastLibBarOn: "Sidebar indicator: playing item",
+        toastLibBarOff: "Sidebar indicator: open item",
         toastStyle: "Palette style: "
     };
 
     function showReloadModal() {
         ensureCoreUiStyle();
         document.getElementById("m3e-reload-modal")?.remove();
-
         const backdrop = document.createElement("div");
         backdrop.id = "m3e-reload-modal";
         backdrop.className = "m3e-modal-backdrop";
@@ -765,20 +877,11 @@
                 </div>
             </div>
         `;
-
-        const close = () => {
-            document.removeEventListener("keydown", onEsc);
-            backdrop.remove();
-        };
+        const close = () => { document.removeEventListener("keydown", onEsc); backdrop.remove(); };
         const onEsc = (e) => { if (e.key === "Escape") close(); };
-
-        backdrop.addEventListener("click", (e) => {
-            if (e.target === backdrop) close();
-        });
+        backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
         backdrop.querySelector(".m3e-modal-btn-later").addEventListener("click", close);
-        backdrop.querySelector(".m3e-modal-btn-now").addEventListener("click", () => {
-            window.location.reload();
-        });
+        backdrop.querySelector(".m3e-modal-btn-now").addEventListener("click", () => window.location.reload());
         document.addEventListener("keydown", onEsc);
         document.body.appendChild(backdrop);
     }
@@ -816,9 +919,7 @@
             while (cur && cur.parentElement && cur.parentElement.tagName !== "MAIN" && cur.parentElement.children.length < 4) {
                 cur = cur.parentElement;
             }
-            if (cur && cur.parentElement && cur.parentElement.children.length >= 2) {
-                firstSec = cur;
-            }
+            if (cur && cur.parentElement && cur.parentElement.children.length >= 2) firstSec = cur;
         }
         if (!firstSec) {
             firstSec =
@@ -835,6 +936,8 @@
         const subEnabled = themeEnabled && isTrack;
         const plusOn = getExpressivePlus();
         const bordersOn = getBordersEnabled();
+        const shortcutsOn = getShortcutsEnabled();
+        const libBarOn = getLibBarEnabled();
         const curStyle = getPaletteStyle();
 
         const sec = document.createElement("div");
@@ -853,85 +956,81 @@
                 <h2 class="encore-text encore-text-title-small" style="${themeEnabled ? "color: var(--spice-m3-primary, #b8cac5);" : ""}">M3 Expressive</h2>
             </div>
             <div class="x-settings-row" data-settings-row="true">
-                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <label class="encore-text encore-text-body-medium" for="m3e-master-toggle" style="cursor: pointer;">
-                        ${STR.enableLabel}
-                    </label>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        ${STR.enableDesc}
-                    </span>
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-master-toggle" style="cursor: pointer;">${STR.enableLabel}</label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.enableDesc}</span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
                         <input id="m3e-master-toggle" type="checkbox" class="x-toggle-input" ${themeEnabled ? "checked" : ""}>
-                        <span class="x-toggle-indicatorWrapper">
-                            <span class="x-toggle-indicator"></span>
-                        </span>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
                     </label>
                 </div>
             </div>
             <div id="m3e-track-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
-                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <label class="encore-text encore-text-body-medium" for="m3e-track-mode-toggle" style="cursor: pointer;">
-                        ${STR.trackLabel}
-                    </label>
-                    <span id="m3e-mode-desc" class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        ${modeDescText(mode)}
-                    </span>
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-track-mode-toggle" style="cursor: pointer;">${STR.trackLabel}</label>
+                    <span id="m3e-mode-desc" class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${modeDescText(mode)}</span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
                         <input id="m3e-track-mode-toggle" type="checkbox" class="x-toggle-input" ${isTrack ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
-                        <span class="x-toggle-indicatorWrapper">
-                            <span class="x-toggle-indicator"></span>
-                        </span>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
                     </label>
                 </div>
             </div>
             <div id="m3e-plus-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
-                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <label class="encore-text encore-text-body-medium" for="m3e-expressive-plus-toggle" style="cursor: pointer;">
-                        Expressive+
-                    </label>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        ${STR.plusDesc}
-                    </span>
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-expressive-plus-toggle" style="cursor: pointer;">Expressive+</label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.plusDesc}</span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
                         <input id="m3e-expressive-plus-toggle" type="checkbox" class="x-toggle-input" ${plusOn ? "checked" : ""} ${subEnabled ? "" : "disabled"}>
-                        <span class="x-toggle-indicatorWrapper">
-                            <span class="x-toggle-indicator"></span>
-                        </span>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
                     </label>
                 </div>
             </div>
             <div id="m3e-borders-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
-                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <label class="encore-text encore-text-body-medium" for="m3e-borders-toggle" style="cursor: pointer;">
-                        ${STR.bordersLabel}
-                    </label>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        ${STR.bordersDesc}
-                    </span>
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-borders-toggle" style="cursor: pointer;">${STR.bordersLabel}</label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.bordersDesc}</span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <label class="x-toggle-wrapper" style="cursor: pointer;">
                         <input id="m3e-borders-toggle" type="checkbox" class="x-toggle-input" ${bordersOn ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
-                        <span class="x-toggle-indicatorWrapper">
-                            <span class="x-toggle-indicator"></span>
-                        </span>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
+                    </label>
+                </div>
+            </div>
+            <div id="m3e-shortcuts-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-shortcuts-toggle" style="cursor: pointer;">${STR.shortcutsLabel}</label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.shortcutsDesc}</span>
+                </div>
+                <div class="x-settings-secondColumn">
+                    <label class="x-toggle-wrapper" style="cursor: pointer;">
+                        <input id="m3e-shortcuts-toggle" type="checkbox" class="x-toggle-input" ${shortcutsOn ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
+                    </label>
+                </div>
+            </div>
+            <div id="m3e-libbar-row" class="x-settings-row ${themeEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
+                <div class="x-settings-firstColumn">
+                    <label class="encore-text encore-text-body-medium" for="m3e-libbar-toggle" style="cursor: pointer;">${STR.libBarLabel}</label>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.libBarDesc}</span>
+                </div>
+                <div class="x-settings-secondColumn">
+                    <label class="x-toggle-wrapper" style="cursor: pointer;">
+                        <input id="m3e-libbar-toggle" type="checkbox" class="x-toggle-input" ${libBarOn ? "checked" : ""} ${themeEnabled ? "" : "disabled"}>
+                        <span class="x-toggle-indicatorWrapper"><span class="x-toggle-indicator"></span></span>
                     </label>
                 </div>
             </div>
             <div id="m3e-style-row" class="x-settings-row ${subEnabled ? "" : "m3e-row-disabled"}" data-settings-row="true">
-                <div class="x-settings-firstColumn qWhdBLUR95jKDvG8ScyT">
-                    <span class="encore-text encore-text-body-medium">
-                        ${STR.styleLabel}
-                    </span>
-                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">
-                        ${STR.styleDesc}
-                    </span>
+                <div class="x-settings-firstColumn">
+                    <span class="encore-text encore-text-body-medium">${STR.styleLabel}</span>
+                    <span class="encore-text encore-text-body-small" style="color: var(--spice-m3-on-surface-var, #b3b3b3);">${STR.styleDesc}</span>
                 </div>
                 <div class="x-settings-secondColumn">
                     <div id="m3e-style-dropdown" class="m3e-dd">
@@ -955,6 +1054,10 @@
         const plusToggle = sec.querySelector("#m3e-expressive-plus-toggle");
         const bordersRow = sec.querySelector("#m3e-borders-row");
         const bordersToggle = sec.querySelector("#m3e-borders-toggle");
+        const shortcutsRow = sec.querySelector("#m3e-shortcuts-row");
+        const shortcutsToggle = sec.querySelector("#m3e-shortcuts-toggle");
+        const libBarRow = sec.querySelector("#m3e-libbar-row");
+        const libBarToggle = sec.querySelector("#m3e-libbar-toggle");
         const styleRow = sec.querySelector("#m3e-style-row");
         const dd = sec.querySelector("#m3e-style-dropdown");
         const ddTrigger = sec.querySelector("#m3e-style-trigger");
@@ -969,6 +1072,10 @@
             trackRow.classList.toggle("m3e-row-disabled", !on);
             bordersToggle.disabled = !on;
             bordersRow.classList.toggle("m3e-row-disabled", !on);
+            shortcutsToggle.disabled = !on;
+            shortcutsRow.classList.toggle("m3e-row-disabled", !on);
+            libBarToggle.disabled = !on;
+            libBarRow.classList.toggle("m3e-row-disabled", !on);
 
             plusToggle.disabled = !sub;
             ddTrigger.disabled = !sub;
@@ -1007,22 +1114,29 @@
             if (isThemeDisabled) return;
             saveExpressivePlus(plusToggle.checked);
             syncPlusState();
-            Spicetify.showNotification(
-                plusToggle.checked ? STR.toastPlusOn : STR.toastPlusOff,
-                false,
-                1200
-            );
+            Spicetify.showNotification(plusToggle.checked ? STR.toastPlusOn : STR.toastPlusOff, false, 1200);
         });
 
         bordersToggle.addEventListener("change", () => {
             if (isThemeDisabled) return;
             saveBordersEnabled(bordersToggle.checked);
             syncBordersState();
-            Spicetify.showNotification(
-                bordersToggle.checked ? STR.toastBordersOn : STR.toastBordersOff,
-                false,
-                1200
-            );
+            Spicetify.showNotification(bordersToggle.checked ? STR.toastBordersOn : STR.toastBordersOff, false, 1200);
+        });
+
+        shortcutsToggle.addEventListener("change", () => {
+            if (isThemeDisabled) return;
+            saveShortcutsEnabled(shortcutsToggle.checked);
+            syncShortcutsState();
+            Spicetify.showNotification(shortcutsToggle.checked ? STR.toastShortcutsOn : STR.toastShortcutsOff, false, 1200);
+        });
+
+        libBarToggle.addEventListener("change", () => {
+            if (isThemeDisabled) return;
+            saveLibBarEnabled(libBarToggle.checked);
+            syncLibBarState();
+            if (typeof syncLibPlaying === "function") syncLibPlaying();
+            Spicetify.showNotification(libBarToggle.checked ? STR.toastLibBarOn : STR.toastLibBarOff, false, 1200);
         });
 
         ddTrigger.addEventListener("click", (e) => {
@@ -1043,9 +1157,7 @@
                 });
                 dd.classList.remove("is-open");
                 ddTrigger.setAttribute("aria-expanded", "false");
-                if (!isThemeDisabled && getMode() === "track") {
-                    await applyTrackPalette();
-                }
+                if (!isThemeDisabled && getMode() === "track") await applyTrackPalette();
                 Spicetify.showNotification(STR.toastStyle + label, false, 1200);
             });
         });
@@ -1063,16 +1175,6 @@
         }, 120);
     }
 
-    const mainView = document.querySelector(".Root__main-view") || document.body;
-    const obs = new MutationObserver(() => {
-        const path = Spicetify.Platform?.History?.location?.pathname || "";
-        if (path && path !== "/preferences") return;
-        if (!document.getElementById("m3e-settings-section") && document.querySelector('[data-testid="settings-page"] h2, .x-settings-row')) {
-            scheduleSettingsInject();
-        }
-    });
-    obs.observe(mainView, { childList: true, subtree: true });
-
     if (Spicetify.Platform?.History?.listen) {
         Spicetify.Platform.History.listen(() => scheduleSettingsInject());
     }
@@ -1083,7 +1185,8 @@
         const pb = document.querySelector(".main-nowPlayingBar-center .playback-bar");
         if (pb) {
             pb.classList.add("m3-instant");
-            setTimeout(() => pb.classList.remove("m3-instant"), 150);
+            clearTimeout(pb._m3SnapTimer);
+            pb._m3SnapTimer = setTimeout(() => pb.classList.remove("m3-instant"), 450);
         }
         if (getMode() === "track") applyTrackPalette();
         if (document.documentElement.dataset.m3ePlus === "1") setTimeout(tintPlayingShortcuts, 250);
@@ -1103,6 +1206,8 @@
     if (!isThemeDisabled) {
         syncPlusState();
         syncBordersState();
+        syncShortcutsState();
+        syncLibBarState();
         if (getMode() === "track") applyInitialTrackPalette();
     }
 })();
@@ -1113,30 +1218,70 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     setTimeout(() => window.dispatchEvent(new Event("resize")), 1200);
 }
 
-// Snap progress bar on window focus and seek
+// Progress bar jump & focus snap
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
-    const snapProgress = () => {
-        const pb = document.querySelector(".main-nowPlayingBar-center .playback-bar");
+    const snapProgress = (ms = 240) => {
+        const pb = document.querySelector(".main-nowPlayingBar-center .playback-bar") ||
+            document.querySelector('[data-testid="playback-progressbar"]')?.parentElement;
         if (!pb) return;
         pb.classList.add("m3-instant");
+        void pb.offsetWidth;
         clearTimeout(pb._m3SnapTimer);
-        pb._m3SnapTimer = setTimeout(() => pb.classList.remove("m3-instant"), 220);
+        pb._m3SnapTimer = setTimeout(() => pb.classList.remove("m3-instant"), ms);
     };
-    window.addEventListener("focus", snapProgress);
+
+    let lastPct = -1;
+    const attachProgressGuard = () => {
+        const pbWrap = document.querySelector('[data-testid="playback-progressbar"]');
+        const bar = pbWrap?.querySelector('[data-testid="progress-bar"], .progress-bar');
+        const pb = pbWrap?.closest(".playback-bar") || pbWrap?.parentElement;
+        if (!bar || !pb || bar._m3Guard) return !!bar?._m3Guard;
+        bar._m3Guard = true;
+        const readPct = () => {
+            const m = (bar.getAttribute("style") || "").match(/--progress-bar-transform:\s*(-?[\d.]+)%/);
+            return m ? 100 + parseFloat(m[1]) : null;
+        };
+        lastPct = readPct() ?? -1;
+        new MutationObserver(() => {
+            const pct = readPct();
+            if (pct === null) return;
+            if (lastPct >= 0 && (pct < lastPct - 0.8 || pct - lastPct > 3.5)) {
+                pb.classList.add("m3-instant");
+                void pb.offsetWidth;
+                clearTimeout(pb._m3SnapTimer);
+                pb._m3SnapTimer = setTimeout(() => pb.classList.remove("m3-instant"), 120);
+            }
+            lastPct = pct;
+        }).observe(bar, { attributes: true, attributeFilter: ["style"] });
+        return true;
+    };
+
+    const guardBoot = setInterval(() => {
+        if (attachProgressGuard()) clearInterval(guardBoot);
+    }, 300);
+    setTimeout(() => clearInterval(guardBoot), 15000);
+
+    window.addEventListener("focus", () => snapProgress(240));
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") snapProgress();
+        if (document.visibilityState === "visible") snapProgress(240);
     });
     document.addEventListener("pointerdown", (e) => {
-        if (e.target?.closest?.(".playback-bar")) snapProgress();
+        if (e.target?.closest?.(".playback-bar")) snapProgress(260);
+        else if (e.target?.closest?.('[data-testid="control-button-skip-forward"], [data-testid="control-button-skip-back"]')) snapProgress(480);
     }, true);
 })();
 
-// Hide upsell, Support, Report and disabled Download items in menus
+// Context menu cleanup & wrapper normalization
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
     const HIDE_MENU_RE = /^(Upgrade to Premium|Перейти на Premium|Улучшить до Premium|Support|Справка|Поддержка|Report|Пожаловаться)$/i;
     const DL_RE = /^(Download|Скачать)$/i;
+    const SHORTCUT_HINT_RE = /^(?:[A-Z]|Ctrl|Alt|Shift|Cmd|Meta|Option|Opt|Del|Delete|Enter|Esc|Escape|Space|Tab|(?:Ctrl|Alt|Shift|Cmd|Meta|Option)\s*[+\-].+|⌘.+|⌥.+|⇧.+)$/i;
+
+    const isSearchBoxOnly = (el) =>
+        !!el.querySelector("input") &&
+        !el.querySelector('[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="link"]');
 
     const cleanMenus = (root) => {
         if (!root || root.nodeType !== 1) return;
@@ -1144,17 +1289,95 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             ? [root]
             : Array.from(root.querySelectorAll?.('[role="menu"]') || []);
         for (const menu of menus) {
+            const hasSection = !!menu.querySelector('[data-encore-id="menuSection"]');
+            const pop = menu.closest('[data-encore-id="popover"]');
+            const tipRoot = menu.closest('#context-menu, [data-tippy-root], .tippy-content');
+
+            if (pop) {
+                pop.classList.add("m3e-menu-outer");
+                pop.classList.toggle("m3e-submenu-popover", !hasSection);
+                pop.classList.toggle("m3e-profile-menu", hasSection);
+                menu.classList.add("m3e-menu-strip");
+
+                let cur = menu.parentElement;
+                while (cur && cur !== pop) {
+                    if (!isSearchBoxOnly(cur)) cur.classList.add("m3e-menu-strip");
+                    cur = cur.parentElement;
+                }
+                const inp = pop.querySelector("input");
+                if (inp?.parentElement) inp.parentElement.classList.add("m3e-menu-search-wrap");
+                const searchField = inp?.parentElement?.parentElement;
+                if (searchField && searchField !== pop && !searchField.matches('[role="menu"]')) {
+                    searchField.classList.add("m3e-menu-search-header");
+                }
+            } else {
+                const host = menu.parentElement;
+                const siblingMenus = host ? host.querySelectorAll(':scope > [role="menu"]') : [];
+                if (siblingMenus.length > 1) {
+                    host.classList.remove("m3e-menu-strip");
+                    host.classList.add("m3e-menu-outer", "m3e-menu-merged");
+                    for (const sm of siblingMenus) {
+                        sm.classList.remove("m3e-menu-outer");
+                        sm.classList.add("m3e-menu-strip");
+                    }
+                    let cur = host.parentElement;
+                    while (cur && tipRoot && cur !== tipRoot && cur !== document.body) {
+                        cur.classList.add("m3e-menu-strip");
+                        cur = cur.parentElement;
+                    }
+                } else {
+                    menu.classList.add("m3e-menu-outer");
+                    menu.classList.toggle("m3e-profile-menu", hasSection);
+                    let cur = host;
+                    while (cur && tipRoot && cur !== tipRoot && cur !== document.body) {
+                        cur.classList.add("m3e-menu-strip");
+                        cur = cur.parentElement;
+                    }
+                }
+            }
+
+            for (const inp of menu.querySelectorAll("input")) {
+                if (inp.parentElement) inp.parentElement.classList.add("m3e-menu-search-wrap");
+                const row = inp.closest('li, [role="menuitem"]');
+                if (row) row.classList.add("m3e-menu-search-row");
+            }
+            for (const box of menu.querySelectorAll("div, ul")) {
+                if (
+                    box.closest('[data-encore-id="menuSection"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="link"], button, a') ||
+                    box.matches('[data-encore-id="menuSection"], [data-encore-id="menuSectionHeader"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="link"], [role="separator"]') ||
+                    isSearchBoxOnly(box)
+                ) continue;
+                box.classList.add("m3e-menu-strip");
+            }
+
             for (const item of menu.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="link"], [class*="-menu-row"], a, button')) {
-                const txt = (item.textContent || "").replace(/\s+/g, " ").trim();
+                for (const kbd of item.querySelectorAll("kbd")) kbd.classList.add("m3e-menu-shortcut");
+                const itemTxt = (item.textContent || "").replace(/\s+/g, " ").trim();
+                for (const sp of item.querySelectorAll("span, div")) {
+                    if (sp.children.length > 0 || sp.querySelector("svg")) continue;
+                    if (sp === item.firstElementChild || item.firstElementChild?.contains(sp)) continue;
+                    const sTxt = (sp.textContent || "").trim();
+                    if (sTxt && itemTxt.length > sTxt.length && SHORTCUT_HINT_RE.test(sTxt)) {
+                        sp.classList.add("m3e-menu-shortcut");
+                        const pHidden = sp.parentElement;
+                        if (pHidden && pHidden !== item && pHidden.getAttribute("aria-hidden") === "true" && !pHidden.querySelector("svg")) {
+                            pHidden.classList.add("m3e-menu-shortcut");
+                        }
+                    }
+                }
+
+                const txt = itemTxt;
                 const aria = (item.getAttribute?.("aria-label") || "").trim();
                 const href = item.getAttribute?.("href") || "";
-                const isDisabled =
-                    item.matches('[aria-disabled="true"], [data-disabled], [data-disabled="true"], :disabled, .QJhiFHy4PAK8GKZ6QM4g') ||
-                    !!item.closest('[aria-disabled="true"], [data-disabled], [data-disabled="true"], .QJhiFHy4PAK8GKZ6QM4g') ||
-                    item.hasAttribute("disabled") ||
-                    parseFloat(getComputedStyle(item).opacity) < 0.75 ||
-                    (item.firstElementChild ? parseFloat(getComputedStyle(item.firstElementChild).opacity) < 0.75 : false);
-                const isDisabledDownload = isDisabled && (DL_RE.test(txt) || DL_RE.test(aria));
+                let isDisabledDownload = false;
+                if (DL_RE.test(txt) || DL_RE.test(aria)) {
+                    isDisabledDownload =
+                        item.matches('[aria-disabled="true"], [data-disabled], [data-disabled="true"], :disabled') ||
+                        !!item.closest('[aria-disabled="true"], [data-disabled], [data-disabled="true"]') ||
+                        item.hasAttribute("disabled") ||
+                        parseFloat(getComputedStyle(item).opacity) < 0.75 ||
+                        (item.firstElementChild ? parseFloat(getComputedStyle(item.firstElementChild).opacity) < 0.75 : false);
+                }
                 if (HIDE_MENU_RE.test(txt) || isDisabledDownload || /support\.spotify\.com|campaign=upgrade/i.test(href)) {
                     const row = item.closest('li, .main-contextMenu-menuItem, [role="menuitem"], [role="menuitemcheckbox"], [role="link"], [class*="-menu-row"]') || item;
                     row.style.setProperty("display", "none", "important");
@@ -1163,27 +1386,35 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         }
     };
 
+    const menuTimers = new WeakMap();
+    const scheduleMenuClean = (menu) => {
+        cleanMenus(menu);
+        clearTimeout(menuTimers.get(menu));
+        menuTimers.set(menu, setTimeout(() => {
+            menuTimers.delete(menu);
+            if (menu.isConnected) cleanMenus(menu);
+        }, 120));
+    };
+
     const menuObs = new MutationObserver((muts) => {
+        const mainEl = document.getElementById("main");
         const menus = new Set();
         for (const m of muts) {
             const t = m.target;
             if (!t || t.nodeType !== 1) continue;
+            if (mainEl && (t === mainEl || mainEl.contains(t))) continue;
             const insideMenu = t.closest?.('[role="menu"]');
             if (insideMenu) {
                 menus.add(insideMenu);
                 continue;
             }
-            if (t.closest?.('#main') && !t.closest?.('[data-encore-id="popover"], #context-menu, [data-tippy-root]')) continue;
             for (const n of m.addedNodes) {
                 if (n.nodeType !== 1) continue;
                 if (n.matches?.('[role="menu"]')) menus.add(n);
                 else n.querySelectorAll?.('[role="menu"]').forEach((menu) => menus.add(menu));
             }
         }
-        for (const menu of menus) {
-            cleanMenus(menu);
-            setTimeout(() => cleanMenus(menu), 80);
-        }
+        for (const menu of menus) scheduleMenuClean(menu);
     });
     menuObs.observe(document.body, { childList: true, subtree: true });
 })();
@@ -1214,34 +1445,21 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             const aFillOp = el.getAttribute?.("fill-opacity") || "";
             let hit = false;
 
-            if (GREEN_RE.test(aStroke)) {
-                el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important");
-                hit = true;
-            }
+            if (GREEN_RE.test(aStroke)) { el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
             if (GREEN_RE.test(aFill)) {
-                const fillVal = isTranslucent(aFill, aFillOp)
-                    ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)"
-                    : "var(--spice-m3-primary, #b8cac5)";
+                const fillVal = isTranslucent(aFill, aFillOp) ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)" : "var(--spice-m3-primary, #b8cac5)";
                 el.style.setProperty("fill", fillVal, "important");
                 hit = true;
             }
 
             const cs = getComputedStyle(el);
-            if (GREEN_RE.test(cs.color)) {
-                el.style.setProperty("color", "var(--spice-m3-primary, #b8cac5)", "important");
-                hit = true;
-            }
+            if (GREEN_RE.test(cs.color)) { el.style.setProperty("color", "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
             if (GREEN_RE.test(cs.fill)) {
-                const fillVal = isTranslucent(cs.fill, cs.fillOpacity)
-                    ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)"
-                    : "var(--spice-m3-primary, #b8cac5)";
+                const fillVal = isTranslucent(cs.fill, cs.fillOpacity) ? "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.18)" : "var(--spice-m3-primary, #b8cac5)";
                 el.style.setProperty("fill", fillVal, "important");
                 hit = true;
             }
-            if (GREEN_RE.test(cs.stroke)) {
-                el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important");
-                hit = true;
-            }
+            if (GREEN_RE.test(cs.stroke)) { el.style.setProperty("stroke", "var(--spice-m3-primary, #b8cac5)", "important"); hit = true; }
             if (GREEN_RE.test(cs.backgroundColor) || GREEN_RE.test(cs.backgroundImage)) {
                 if (el.tagName === "BUTTON") {
                     el.style.setProperty("background-color", "rgba(var(--spice-rgb-m3-primary, 184, 202, 197), 0.20)", "important");
@@ -1262,13 +1480,25 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         djTimer = setTimeout(() => { djTimer = null; recolorDj(); }, 120);
     };
 
+    let waitTries = 0;
     const waitBar = setInterval(() => {
         const bar = document.querySelector(".main-nowPlayingBar-right");
-        if (!bar) return;
+        if (!bar) {
+            if (++waitTries > 40) clearInterval(waitBar);
+            return;
+        }
         clearInterval(waitBar);
         recolorDj();
-        bar.addEventListener("pointerenter", scheduleDj, true);
-        new MutationObserver(scheduleDj).observe(bar, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "aria-pressed", "aria-checked"] });
+        bar.addEventListener("pointerenter", scheduleDj);
+        new MutationObserver((muts) => {
+            for (const m of muts) {
+                const t = m.target;
+                if (t && t.nodeType === 1 && !t.closest?.(".main-nowPlayingBar-volumeBar, [data-testid='volume-bar']")) {
+                    scheduleDj();
+                    break;
+                }
+            }
+        }).observe(bar, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "aria-pressed", "aria-checked"] });
     }, 400);
 
     if (window.Spicetify?.Player) {
@@ -1276,7 +1506,45 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
     }
 })();
 
-// DOM class bridge for unmapped Spotify builds (Linux & future updates)
+// Play/Pause state & instant morph intent
+(() => {
+    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
+    const syncPlaying = () => {
+        const playing = !!window.Spicetify?.Player?.isPlaying?.();
+        document.documentElement.dataset.m3ePlaying = playing ? "1" : "0";
+    };
+    let tries = 0;
+    const waitP = setInterval(() => {
+        if (window.Spicetify?.Player?.addEventListener) {
+            clearInterval(waitP);
+            syncPlaying();
+            Spicetify.Player.addEventListener("onplaypause", syncPlaying);
+            Spicetify.Player.addEventListener("songchange", () => setTimeout(syncPlaying, 60));
+        } else if (++tries > 40) {
+            clearInterval(waitP);
+        }
+    }, 250);
+
+    let clearTimer = null;
+    document.addEventListener("click", (e) => {
+        const btn = e.target?.closest?.('[data-testid="control-button-playpause"]');
+        if (!btn) return;
+        const isCurrentlyPlaying =
+            btn.classList.contains("m3e-intent-playing") ||
+            (!btn.classList.contains("m3e-intent-paused") &&
+             (document.documentElement.dataset.m3ePlaying === "1" || /Pause|Пауз/i.test(btn.getAttribute("aria-label") || "")));
+        btn.classList.toggle("m3e-intent-paused", isCurrentlyPlaying);
+        btn.classList.toggle("m3e-intent-playing", !isCurrentlyPlaying);
+        document.documentElement.dataset.m3ePlaying = isCurrentlyPlaying ? "0" : "1";
+        clearTimeout(clearTimer);
+        clearTimer = setTimeout(() => {
+            btn.classList.remove("m3e-intent-paused", "m3e-intent-playing");
+            syncPlaying();
+        }, 900);
+    }, true);
+})();
+
+// DOM class bridge (Linux & unmapped Spotify builds)
 (() => {
     if (localStorage.getItem("m3e_theme_disabled") === "1") return;
 
@@ -1329,11 +1597,24 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         addCls(scope.querySelector('[data-testid="progress-bar-handle"]'), "progress-bar__slider");
     };
 
+    const syncLibPlaying = () => {
+        const navBar = document.querySelector(".Root__nav-bar");
+        if (!navBar) return;
+        const ctxUri = Spicetify.Player?.data?.context?.uri || "";
+        const ctxTail = ctxUri ? ctxUri.split(":").pop() : "";
+        for (const item of navBar.querySelectorAll('.main-yourLibraryX-listItem, [role="row"], [role="listitem"]')) {
+            const lbl = item.querySelector('[aria-labelledby]')?.getAttribute("aria-labelledby") || "";
+            const hasAccent = !!item.querySelector(".encore-internal-color-text-bright-accent");
+            const isCtx = (!!ctxUri && lbl.includes(ctxUri)) || (!!ctxTail && !!item.querySelector(`a[href*="${ctxTail}"]`)) || hasAccent;
+            item.classList.toggle("m3e-lib-playing", isCtx);
+        }
+    };
     const syncAll = () => {
         ensureBridgeStyle();
 
-        const aside = document.querySelector('[data-testid="now-playing-bar"]');
+        const aside = document.querySelector('[data-testid="now-playing-bar"]:not(.m3e-shell-bridged)');
         if (aside) {
+            addCls(aside, "m3e-shell-bridged");
             addCls(aside, "main-nowPlayingBar-container");
             const npbSlot = aside.parentElement;
             addCls(npbSlot, "Root__now-playing-bar");
@@ -1356,8 +1637,9 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             }
         }
 
-        const controls = document.querySelector('[data-testid="player-controls"]');
+        const controls = document.querySelector('[data-testid="player-controls"]:not(.m3e-ctrl-bridged)');
         if (controls) {
+            addCls(controls, "m3e-ctrl-bridged");
             const center = controls.parentElement;
             addCls(center, "main-nowPlayingBar-center");
             const inner = center?.parentElement;
@@ -1368,7 +1650,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             }
         }
 
-        const pbWrap = document.querySelector('[data-testid="playback-progressbar"]');
+        const pbWrap = document.querySelector('[data-testid="playback-progressbar"]:not(.playback-progressbar)');
         if (pbWrap) {
             addCls(pbWrap, "playback-progressbar");
             let p = pbWrap.parentElement;
@@ -1381,22 +1663,28 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             syncProgress(pbWrap);
         }
 
-        const vol = document.querySelector('[data-testid="volume-bar"]');
+        const vol = document.querySelector('[data-testid="volume-bar"]:not(.main-nowPlayingBar-volumeBar)');
         if (vol) {
             addCls(vol, "main-nowPlayingBar-volumeBar");
             syncProgress(vol);
         }
 
+        const path = Spicetify.Platform?.History?.location?.pathname || "";
+        const isHome = !path || path === "/" || path.startsWith("/home");
+        const isPrefs = path === "/preferences";
+        const isWnRoute = /content-feed|notifications/i.test(path);
+        const isLyricsRoute = /\/lyrics/i.test(path);
+
         const mainView = document.querySelector(".Root__main-view");
-        if (mainView) {
-            for (const d of mainView.querySelectorAll('div[style*="background-color"]:not(.main-home-homeHeader)')) {
-                if (d.dataset.m3eHdrChecked) continue;
-                d.dataset.m3eHdrChecked = "1";
-                const cs = getComputedStyle(d);
-                if (cs.position === "absolute" && cs.backgroundImage && cs.backgroundImage.includes("linear-gradient")) {
-                    const rect = d.getBoundingClientRect();
-                    if (rect.height >= 120 && rect.height <= 460 && rect.width > 300) {
-                        addCls(d, "main-home-homeHeader");
+        if (mainView && isHome) {
+            const homePage = mainView.querySelector('[data-testid="home-page"]');
+            if (homePage && !mainView.querySelector(".main-home-homeHeader")) {
+                const hdrCand = mainView.querySelector('main > div > div[style*="background-color"]:not(.m3e-hdr-chk), [data-testid="home-page"] > div > div[style*="background-color"]:not(.m3e-hdr-chk)');
+                if (hdrCand) {
+                    addCls(hdrCand, "m3e-hdr-chk");
+                    const cs = getComputedStyle(hdrCand);
+                    if (cs.position === "absolute" && cs.backgroundImage && cs.backgroundImage.includes("linear-gradient")) {
+                        addCls(hdrCand, "main-home-homeHeader");
                     }
                 }
             }
@@ -1404,8 +1692,12 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             const homeChip = mainView.querySelector('button[role="checkbox"]:not(.m3e-chip-checked), [data-encore-id="chip"]:not(.m3e-chip-checked)');
             if (homeChip) {
                 addCls(homeChip, "m3e-chip-checked");
-                const chipGroup = homeChip.closest('[class*="chip-group"]');
-                if (chipGroup) addCls(chipGroup, "m3e-home-chips-row");
+                const itemWrap = homeChip.closest('[data-carousel-item="true"]');
+                const chipGroup = homeChip.closest('[class*="chip-group"]') || (itemWrap ? itemWrap.parentElement : homeChip.parentElement);
+                if (chipGroup && chipGroup !== mainView) {
+                    addCls(chipGroup, "m3e-home-chips-row");
+                    addCls(chipGroup.parentElement, "m3e-home-chips-wrap");
+                }
                 if (!mainView.querySelector(".main-home-filterChipsContainer")) {
                     let cur = homeChip.parentElement;
                     while (cur && cur !== mainView) {
@@ -1442,26 +1734,30 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                      !item.querySelector('[aria-labelledby*=":playlist:"], [aria-labelledby*=":collection"], [id*=":playlist:"], [id*=":collection"]'));
                 if (isArtist) addCls(item, "m3e-circle-art");
             }
+
         }
 
         const rightBar = document.querySelector(".Root__right-sidebar");
         if (rightBar) {
-            for (const sec of rightBar.querySelectorAll(".main-nowPlayingView-section")) {
+            for (const sec of rightBar.querySelectorAll(".main-nowPlayingView-section:not(.m3e-rs-chk)")) {
+                addCls(sec, "m3e-rs-chk");
                 if (sec.querySelector('[data-testid*="lyrics" i], [class*="lyrics" i]')) {
                     addCls(sec, "m3e-lyrics-card");
                 }
             }
+            for (const tourA of rightBar.querySelectorAll('a[href*="/concert/"]:not(.m3e-tour-ok)')) {
+                addCls(tourA, "m3e-tour-ok");
+                addCls(tourA.parentElement, "m3e-tour-row");
+            }
         }
 
-        const settingsPage = document.querySelector('[data-testid="settings-page"]');
+        const settingsPage = isPrefs ? document.querySelector('[data-testid="settings-page"]') : null;
         if (settingsPage) {
             if (!document.getElementById("m3e-settings-section")) window.__m3eTryInjectSettings?.();
             for (const h2 of settingsPage.querySelectorAll("h2")) {
                 if (h2.closest("#m3e-settings-section")) continue;
                 const sec = h2.parentElement;
-                if (sec && sec.parentElement && sec.parentElement.children.length >= 4) {
-                    addCls(sec, "x-settings-section");
-                }
+                if (sec && sec.parentElement && sec.parentElement.children.length >= 4) addCls(sec, "x-settings-section");
             }
             for (const inp of settingsPage.querySelectorAll('input[type="checkbox"]')) {
                 if (inp.closest("#m3e-settings-section")) continue;
@@ -1472,7 +1768,12 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                     const indWrap = inp.nextElementSibling;
                     if (indWrap) {
                         addCls(indWrap, "x-toggle-indicatorWrapper");
-                        addCls(indWrap.firstElementChild, "x-toggle-indicator");
+                        const ind = indWrap.firstElementChild;
+                        addCls(ind, "x-toggle-indicator");
+                        if (indWrap.offsetWidth > 0 && indWrap.offsetWidth <= 32) {
+                            addCls(indWrap, "m3e-toggle-sm");
+                            addCls(ind, "m3e-toggle-sm");
+                        }
                     }
                     const col2 = lbl.parentElement;
                     addCls(col2, "x-settings-secondColumn");
@@ -1505,9 +1806,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                 const wrap = pb.tagName === "BUTTON" ? pb.parentElement : pb;
                 addCls(wrap, "main-playButton-PlayButton");
                 const slot = wrap?.parentElement;
-                if (slot && slot !== c && getComputedStyle(slot).position === "absolute") {
-                    addCls(slot, "main-card-PlayButtonContainer");
-                }
+                if (slot && slot !== c && getComputedStyle(slot).position === "absolute") addCls(slot, "main-card-PlayButtonContainer");
             }
         }
         for (const img of document.querySelectorAll('[data-testid="card-image"]:not(.main-cardImage-image)')) {
@@ -1521,48 +1820,177 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                 if (playBtn) {
                     const wrap = playBtn.tagName === "BUTTON" ? playBtn.parentElement : playBtn;
                     addCls(wrap, "main-playButton-PlayButton");
-                    if (wrap?.parentElement && wrap.parentElement !== imgContainer) {
-                        addCls(wrap.parentElement, "main-card-PlayButtonContainer");
-                    }
+                    if (wrap?.parentElement && wrap.parentElement !== imgContainer) addCls(wrap.parentElement, "main-card-PlayButtonContainer");
                 }
             }
             const card = img.closest('[role="group"], [draggable="true"], [data-encore-id="card"]') || imgContainer?.parentElement?.parentElement;
-            if (card && !card.matches('[data-testid="shortcut-card"]')) {
-                addCls(card, "main-card-card");
+            if (card && !card.matches('[data-testid="shortcut-card"]')) addCls(card, "main-card-card");
+        }
+
+        for (const el of document.querySelectorAll('[data-testid="play-button"]:not(.m3e-pb-ok), button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]:not([data-testid="control-button-playpause"]):not(.m3e-pb-ok)')) {
+            addCls(el, "m3e-pb-ok");
+            addCls(el.tagName === "BUTTON" ? el.parentElement : el, "main-playButton-PlayButton");
+        }
+        if (!isHome && !isPrefs && !isLyricsRoute) {
+            for (const el of document.querySelectorAll('[data-testid="tracklist-row"]:not(.main-trackList-trackListRow)')) addCls(el, "main-trackList-trackListRow");
+        }
+        if (isHome) {
+            for (const el of document.querySelectorAll('[data-testid="shortcut-card"]:not(.view-homeShortcutsGrid-shortcut)')) addCls(el, "view-homeShortcutsGrid-shortcut");
+        }
+
+        // What's New feed cards (hash-free, route-gated)
+        const wnCards = isWnRoute && mainView ? mainView.querySelectorAll('[data-encore-id="listRow"]:not(.m3e-wn-ready)') : [];
+        for (const card of wnCards) {
+            const kids = Array.from(card.children);
+            const titleEl = card.querySelector("h3, [data-testid='listRowTitle']");
+            const imgEl = card.querySelector("img");
+            if (!titleEl || !imgEl || card.querySelectorAll("button").length < 2) continue;
+
+            addCls(card, "m3e-wn-ready");
+            addCls(card, "m3e-wn-card");
+
+            const grp = card.parentElement;
+            if (grp) {
+                addCls(grp, "m3e-wn-group");
+                const hr = grp.querySelector("hr");
+                if (hr) addCls(hr, "m3e-wn-hr");
+                const feed = grp.parentElement?.parentElement || grp.parentElement;
+                if (feed && feed !== document.body) {
+                    const feedTarget = grp.parentElement?.children?.length > 1 ? grp.parentElement : feed;
+                    addCls(feedTarget, "m3e-wn-feed");
+                    const filterBar = mainView.querySelector('[aria-orientation="horizontal"], [role="radiogroup"]');
+                    if (filterBar) addCls(filterBar, "m3e-wn-filters");
+                }
+            }
+
+            const mediaSlot = kids.find((ch) => ch.contains(imgEl));
+            if (mediaSlot) {
+                addCls(mediaSlot, "m3e-wn-media");
+                const artBox = imgEl.parentElement;
+                if (artBox) {
+                    addCls(artBox, "m3e-wn-art-box");
+                    if (card.clientWidth >= 560) addCls(artBox, "m3e-wn-art-wide");
+                    const checkVideo = () => {
+                        const rImg = imgEl.naturalWidth > 0 ? imgEl.naturalWidth / Math.max(1, imgEl.naturalHeight) : 0;
+                        const rBox = artBox.clientWidth > 0 ? artBox.clientWidth / Math.max(1, artBox.clientHeight) : 0;
+                        if (rImg > 1.35 || rBox > 1.35) addCls(artBox, "m3e-wn-art-video");
+                    };
+                    checkVideo();
+                    if (!imgEl.complete) imgEl.addEventListener("load", checkVideo, { once: true });
+                }
+            }
+
+            const headerSlot = kids.find((ch) => ch.contains(titleEl));
+            if (headerSlot) addCls(headerSlot, "m3e-wn-header");
+
+            const playBtn = card.querySelector('[data-testid="play-button"], .main-playButton-PlayButton button, button[aria-label*="Play" i], button[aria-label*="Pause" i], button[aria-label*="Пауз" i], button[aria-label*="Воспроизв" i]');
+            const footerSlot = playBtn ? kids.find((ch) => ch.contains(playBtn)) : null;
+            if (footerSlot) {
+                addCls(footerSlot, "m3e-wn-footer");
+                const footerInner = footerSlot.firstElementChild;
+                if (footerInner) {
+                    addCls(footerInner, "m3e-wn-footer-inner");
+                    for (const fc of footerInner.children) {
+                        if (fc.contains(playBtn)) addCls(fc, "m3e-wn-play");
+                        else if (fc.querySelector("button")) addCls(fc, "m3e-wn-actions");
+                    }
+                }
+            }
+
+            const bodySlot = kids.find((ch) =>
+                ch !== mediaSlot && ch !== headerSlot && ch !== footerSlot &&
+                !ch.matches("button, :first-child") && (ch.textContent || "").trim().length > 0
+            );
+            if (bodySlot) {
+                addCls(bodySlot, "m3e-wn-body");
+                if (bodySlot.firstElementChild) addCls(bodySlot.firstElementChild, "m3e-wn-meta");
             }
         }
 
-        for (const el of document.querySelectorAll('[data-testid="play-button"], button[data-encore-id="buttonPrimary"][data-is-icon-only="true"]:not([data-testid="control-button-playpause"])')) {
-            addCls(el.tagName === "BUTTON" ? el.parentElement : el, "main-playButton-PlayButton");
+        // Entity / Recents rows ([data-entity-row])
+        for (const row of document.querySelectorAll('[data-entity-row]:not(.m3e-entity-row)')) {
+            addCls(row, "m3e-entity-row");
+            if (row.parentElement) addCls(row.parentElement, "m3e-entity-grid");
+
+            if (row.closest("#main")) {
+                if (row.parentElement?.parentElement && row.parentElement.parentElement.matches('[role="listitem"], [role="button"], button, div')) {
+                    const gp = row.parentElement.parentElement;
+                    if (gp !== mainView && gp.children.length <= 2) addCls(gp, "m3e-entity-card");
+                }
+            }
+
+            const img = row.querySelector("img");
+            const isCircle = /artist|user/i.test(row.getAttribute("data-entity-row") || "") || !!row.querySelector('[class*="circular" i]');
+            if (img?.parentElement) {
+                addCls(img.parentElement, "m3e-entity-art");
+                if (isCircle) addCls(img.parentElement, "m3e-circle");
+                if (img.parentElement.parentElement && img.parentElement.parentElement !== row) {
+                    addCls(img.parentElement.parentElement, "m3e-entity-art-wrap");
+                }
+            }
+
+            const artWrap = img?.closest("div");
+            const pb = row.querySelector('.main-playButton-PlayButton button, [data-testid="play-button"], button[aria-label*="Play" i], button[aria-label*="Pause" i], button[aria-label*="Воспроизв" i], button[aria-label*="Пауз" i]')
+                || Array.from(row.querySelectorAll("button")).find((b) => artWrap && (artWrap.contains(b) || b.parentElement?.contains(artWrap)) && b.querySelector("svg"));
+            if (pb) {
+                addCls(pb, "m3e-entity-play-btn");
+                const wrap = pb.closest(".main-playButton-PlayButton") || pb;
+                if (wrap.parentElement && wrap.parentElement !== row) {
+                    addCls(wrap.parentElement, "m3e-entity-play-overlay");
+                    if (isCircle) addCls(wrap.parentElement, "m3e-circle");
+                }
+            }
         }
-        for (const el of document.querySelectorAll('[data-testid="tracklist-row"]:not(.main-trackList-trackListRow)')) addCls(el, "main-trackList-trackListRow");
-        for (const el of document.querySelectorAll('[data-testid="shortcut-card"]:not(.view-homeShortcutsGrid-shortcut)')) addCls(el, "view-homeShortcutsGrid-shortcut");
 
-        for (const card of document.querySelectorAll(".e6ssqE0uX8qNAFRRz8rV:not(.m3e-wn-ready)")) {
-            addCls(card, "m3e-wn-ready");
-            const kids = Array.from(card.children);
-            const mediaEl = card.querySelector(".W0HxH4qBfxlGF8ihq8ex, .AMNaKvCRDGoAyl4ltPZg");
-            const mediaSlot = mediaEl ? kids.find((ch) => ch.contains(mediaEl)) : null;
-            if (mediaSlot) addCls(mediaSlot, "m3e-wn-media");
+        // Fullscreen Lyrics (.lyrics-lyricsContent-text, hash-free & route-gated)
+        const lyricText = isLyricsRoute && mainView ? mainView.querySelector(".lyrics-lyricsContent-text") : null;
+        if (lyricText) {
+            const listBox = lyricText.parentElement?.parentElement;
+            if (listBox) {
+                let varsBox = listBox;
+                while (varsBox && varsBox !== mainView && !varsBox.style?.getPropertyValue("--lyrics-color-background")) {
+                    if (varsBox.parentElement?.querySelector(".lyrics-lyricsContent-text") && varsBox.parentElement !== mainView) {
+                        varsBox = varsBox.parentElement;
+                    } else break;
+                }
+                addCls(varsBox, "m3e-lyrics-vars");
 
-            const titleEl = card.querySelector("h3, [data-testid='listRowTitle']");
-            const headerSlot = titleEl ? kids.find((ch) => ch.contains(titleEl)) : null;
-            if (headerSlot) addCls(headerSlot, "m3e-wn-header");
+                const page = mainView ? varsBox.closest(".Root__main-view > div, .Root__main-view main > div") || varsBox.parentElement?.parentElement : null;
+                if (page && page.contains(varsBox)) {
+                    addCls(page, "m3e-lyrics-page");
+                    const firstBg = page.firstElementChild;
+                    if (firstBg && firstBg.children.length === 0 && firstBg !== varsBox) addCls(firstBg, "m3e-lyrics-bg");
+                    for (const el of page.querySelectorAll("div")) {
+                        if (el.closest(".m3e-lyrics-vars")) continue;
+                        if (el.offsetHeight >= 28 && el.offsetHeight <= 40 && el.children.length === 2 && el.querySelector("svg") && el.textContent.trim().length > 0 && el.textContent.trim().length < 40) {
+                            addCls(el, "m3e-lyrics-translate");
+                        }
+                    }
+                }
 
-            const bodyEl = card.querySelector(".gIS5JUiTKLNmvZGDu3ei, .jg8minRucYgGRfA_3Hz1");
-            const bodySlot = bodyEl ? kids.find((ch) => ch.contains(bodyEl)) : null;
-            if (bodySlot) addCls(bodySlot, "m3e-wn-body");
-
-            const footerEl = card.querySelector(".unqqrJbT4kC4bCvEjysi");
-            const footerSlot = footerEl ? kids.find((ch) => ch.contains(footerEl)) : null;
-            if (footerSlot) addCls(footerSlot, "m3e-wn-footer");
+                const syncLines = () => {
+                    for (const lt of listBox.querySelectorAll(".lyrics-lyricsContent-text")) {
+                        const ln = lt.parentElement;
+                        if (!ln) continue;
+                        addCls(ln, "m3e-lyrics-line");
+                        const clickable = getComputedStyle(ln).cursor === "pointer";
+                        ln.classList.toggle("m3e-lyrics-idle", clickable);
+                        ln.classList.toggle("m3e-lyrics-active", !clickable);
+                    }
+                };
+                syncLines();
+                if (!listBox.dataset.m3eLyricsObs) {
+                    listBox.dataset.m3eLyricsObs = "1";
+                    new MutationObserver(syncLines).observe(listBox, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+                }
+            }
         }
     };
 
     let timer = null;
     const schedule = () => {
         if (timer) return;
-        timer = setTimeout(() => { timer = null; syncAll(); }, 100);
+        timer = setTimeout(() => { timer = null; syncAll(); }, 220);
     };
 
     let bootTries = 0;
@@ -1571,6 +1999,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
         const root = document.getElementById("main");
         if ((root && document.querySelector('[data-testid="now-playing-bar"]')) || ++bootTries >= 25) {
             clearInterval(boot);
+            syncLibPlaying();
             new MutationObserver((muts) => {
                 for (const m of muts) {
                     const t = m.target;
@@ -1580,30 +2009,20 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
                     }
                 }
             }).observe(root || document.body, { childList: true, subtree: true });
+
+            if (window.Spicetify?.Platform?.History?.listen) {
+                Spicetify.Platform.History.listen(() => requestAnimationFrame(() => {
+                    syncAll();
+                    syncLibPlaying();
+                }));
+            }
+            Spicetify.Player?.addEventListener?.("songchange", () => {
+                setTimeout(syncLibPlaying, 150);
+                setTimeout(syncLibPlaying, 550);
+            });
+            setTimeout(syncLibPlaying, 800);
+
             window.dispatchEvent(new Event("resize"));
         }
     }, 200);
-})();
-
-// Instant Play/Pause shape intent during Spotify audio fade-out
-(() => {
-    if (localStorage.getItem("m3e_theme_disabled") === "1") return;
-    let clearTimer = null;
-
-    document.addEventListener("click", (e) => {
-        const btn = e.target?.closest?.('[data-testid="control-button-playpause"]');
-        if (!btn) return;
-
-        const isCurrentlyPlaying =
-            btn.classList.contains("m3e-intent-playing") ||
-            (!btn.classList.contains("m3e-intent-paused") && /Pause|Пауз/i.test(btn.getAttribute("aria-label") || ""));
-
-        btn.classList.toggle("m3e-intent-paused", isCurrentlyPlaying);
-        btn.classList.toggle("m3e-intent-playing", !isCurrentlyPlaying);
-
-        clearTimeout(clearTimer);
-        clearTimer = setTimeout(() => {
-            btn.classList.remove("m3e-intent-paused", "m3e-intent-playing");
-        }, 900);
-    }, true);
 })();
