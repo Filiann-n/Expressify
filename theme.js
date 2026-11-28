@@ -1568,7 +1568,7 @@ if (localStorage.getItem("m3e_theme_disabled") !== "1") {
             :where(#m3e-settings-section .x-toggle-input) { opacity: 0; pointer-events: none; position: absolute; }
             :where(#m3e-settings-section .x-toggle-indicatorWrapper) { width: 42px; height: 24px; border-radius: 24px; position: relative; display: block; }
             :where(#m3e-settings-section .x-toggle-indicator) { width: 20px; height: 20px; border-radius: 50%; position: absolute; top: 2px; left: 2px; display: block; }
-            :where(#m3e-settings-section input:checked ~ .x-toggle-indicatorWrapper .x-toggle-indicator) { left: auto; right: 2px; }
+            :where(#m3e-settings-section input:checked ~ .x-toggle-indicatorWrapper .x-toggle-indicator) { left: calc(100% - 22px); right: auto; transform: none; }
         `;
         document.head.appendChild(st);
     };

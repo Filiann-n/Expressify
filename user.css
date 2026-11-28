@@ -3995,14 +3995,17 @@ html body .x-toggle-wrapper .x-toggle-indicatorWrapper {
 html body .x-toggle-wrapper .x-toggle-indicator {
   background-color: var(--spice-m3-outline, #919190) !important;
   border-radius: 50% !important;
-  transition: background-color 0.2s ease, left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.2s ease, height 0.2s ease, top 0.2s ease, transform 0.2s ease !important;
+  transition: background-color 0.2s ease, left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), inset-inline-start 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.2s ease, height 0.2s ease, top 0.2s ease, transform 0.2s ease !important;
 }
 
 html body .x-toggle-wrapper .x-toggle-indicator:not(.m3e-toggle-sm) {
   width: 16px !important;
   height: 16px !important;
   top: 4px !important;
+  right: auto !important;
   left: 4px !important;
+  inset-inline: 4px auto !important;
+  transform: translate3d(0, 0, 0) !important;
 }
 
 html body .x-toggle-wrapper input:hover:not([disabled], :active) ~ .x-toggle-indicatorWrapper {
@@ -4027,8 +4030,10 @@ html body .x-toggle-wrapper input:checked ~ .x-toggle-indicatorWrapper .x-toggle
   width: 20px !important;
   height: 20px !important;
   top: 2px !important;
-  left: auto !important;
-  right: 2px !important;
+  right: auto !important;
+  left: calc(100% - 22px) !important;
+  inset-inline: calc(100% - 22px) auto !important;
+  transform: translate3d(0, 0, 0) !important;
 }
 
 html body .x-toggle-wrapper input:checked:hover:not([disabled], :active) ~ .x-toggle-indicatorWrapper {
@@ -4038,7 +4043,7 @@ html body .x-toggle-wrapper input:checked:hover:not([disabled], :active) ~ .x-to
 
 html body .x-toggle-wrapper input:checked:hover:not([disabled], :active) ~ .x-toggle-indicatorWrapper .x-toggle-indicator {
   background-color: var(--spice-m3-on-primary, #233430) !important;
-  transform: scale(1.06) !important;
+  transform: translate3d(0, 0, 0) scale(1.06) !important;
 }
 
 .main-dropDown-dropDown {
